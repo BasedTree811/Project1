@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../models/book.dart';
+
 class ApiService {
 
-  // Для Android Emulator
   static const String baseUrl =
       "http://10.0.2.2/library_api";
 
   // =========================
-  // REGISTRATION
+  // REGISTER
   // =========================
 
   static Future registerUser({
@@ -61,5 +62,24 @@ class ApiService {
     );
 
     return jsonDecode(response.body);
+  }
+
+  // =========================
+  // GET BOOKS
+  // =========================
+
+  static Future<List<Book>> getBooks() async {
+
+    var url = Uri.parse(
+      "$baseUrl/get_books.php",
+    );
+
+    var response = await http.get(url);
+
+    List data = jsonDecode(response.body);
+
+    return data
+        .map((book) => Book.fromJson(book))
+        .toList();
   }
 }
