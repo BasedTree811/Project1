@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/book.dart';
 import '../services/api_service.dart';
+import 'book_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
 
@@ -13,12 +14,15 @@ class HomeScreen extends StatefulWidget {
   });
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() =>
+      _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState
+    extends State<HomeScreen> {
 
   List<Book> books = [];
+  List<Book> filteredBooks = [];
 
   bool isLoading = true;
 
@@ -33,9 +37,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
     books = await ApiService.getBooks();
 
+    filteredBooks = books;
+
     setState(() {
       isLoading = false;
     });
+  }
+
+  void searchBooks(String query) {
+
+    filteredBooks = books.where((book) {
+
+      return book.title
+          .toLowerCase()
+          .contains(
+        query.toLowerCase(),
+      ) ||
+          book.author
+              .toLowerCase()
+              .contains(
+            query.toLowerCase(),
+          );
+
+    }).toList();
+
+    setState(() {});
   }
 
   @override
@@ -55,45 +81,113 @@ class _HomeScreenState extends State<HomeScreen> {
         child: CircularProgressIndicator(),
       )
 
-          : ListView.builder(
+          : Column(
+        children: [
 
-        itemCount: books.length,
+          Padding(
+            padding:
+            const EdgeInsets.all(15),
 
-        itemBuilder: (context, index) {
+            child: TextField(
 
-          Book book = books[index];
+              onChanged: searchBooks,
 
-          return Card(
+              decoration:
+              InputDecoration(
 
-            margin: const EdgeInsets.all(10),
+                hintText:
+                "Поиск книг...",
 
-            child: ListTile(
+                prefixIcon:
+                const Icon(
+                  Icons.search,
+                ),
 
-              leading: const Icon(
-                Icons.book,
-                size: 40,
-              ),
-
-              title: Text(book.title),
-
-              subtitle: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
-
-                children: [
-
-                  Text(book.author),
-
-                  Text(book.genre),
-                ],
-              ),
-
-              trailing: const Icon(
-                Icons.arrow_forward_ios,
+                border:
+                OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(
+                    15,
+                  ),
+                ),
               ),
             ),
-          );
-        },
+          ),
+
+          Expanded(
+            child: ListView.builder(
+
+              itemCount:
+              filteredBooks.length,
+
+              itemBuilder:
+                  (context, index) {
+
+                Book book =
+                filteredBooks[index];
+
+                return Card(
+
+                  margin:
+                  const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 8,
+                  ),
+
+                  child: ListTile(
+
+                    leading: const Icon(
+                      Icons.book,
+                      size: 40,
+                    ),
+
+                    title:
+                    Text(book.title),
+
+                    subtitle: Column(
+                      crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
+                      children: [
+
+                        Text(
+                          book.author,
+                        ),
+
+                        Text(
+                          book.genre,
+                        ),
+                      ],
+                    ),
+
+                    trailing:
+                    const Icon(
+                      Icons
+                          .arrow_forward_ios,
+                    ),
+
+                    onTap: () {
+
+                      Navigator.push(
+
+                        context,
+
+                        MaterialPageRoute(
+
+                          builder: (_) =>
+                              BookDetailsScreen(
+                                book: book,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
