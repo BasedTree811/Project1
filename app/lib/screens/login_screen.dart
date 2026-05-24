@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'main_screen.dart';
 import '../services/api_service.dart';
 import 'home_screen.dart';
 
@@ -19,35 +19,56 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void login() async {
 
-    setState(() {
-      isLoading = true;
-    });
+    try {
 
-    var result = await ApiService.loginUser(
-      login: loginController.text,
-      password: passwordController.text,
-    );
+      setState(() {
+        isLoading = true;
+      });
 
-    setState(() {
-      isLoading = false;
-    });
-
-    if (result["success"] == true) {
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => HomeScreen(
-            userData: result["user"],
-          ),
-        ),
+      var result = await ApiService.loginUser(
+        login: loginController.text,
+        password: passwordController.text,
       );
 
-    } else {
+      setState(() {
+        isLoading = false;
+      });
+
+      print(result);
+
+      if (result["success"] == true) {
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => MainScreen(
+              userData: result["user"],
+            ),
+          ),
+        );
+
+      } else {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result["message"]),
+          ),
+        );
+      }
+
+    } catch (e) {
+
+      setState(() {
+        isLoading = false;
+      });
+
+      print(e);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result["message"]),
+          content: Text(
+            "Ошибка подключения к серверу",
+          ),
         ),
       );
     }

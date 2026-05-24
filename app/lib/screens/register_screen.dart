@@ -19,28 +19,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool isLoading = false;
 
   void register() async {
+    setState(() => isLoading = true);
 
-    setState(() {
-      isLoading = true;
-    });
+    try {
+      var result = await ApiService.registerUser(
+        surname: surnameController.text,
+        name: nameController.text,
+        email: emailController.text,
+        login: loginController.text,
+        password: passwordController.text,
+      );
 
-    var result = await ApiService.registerUser(
-      surname: surnameController.text,
-      name: nameController.text,
-      email: emailController.text,
-      login: loginController.text,
-      password: passwordController.text,
-    );
-
-    setState(() {
-      isLoading = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(result["message"]),
-      ),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result["message"])),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ошибка: $e")),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
 
   @override

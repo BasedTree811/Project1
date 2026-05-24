@@ -6,7 +6,7 @@ import '../models/book.dart';
 class ApiService {
 
   static const String baseUrl =
-      "http://10.0.2.2/library_api";
+      "http://localhost/library_api";
 
   // =========================
   // REGISTER
