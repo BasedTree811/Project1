@@ -126,45 +126,95 @@ class _HomeScreenState
                 Book book =
                 filteredBooks[index];
 
-                return Card(
+                return Container(
 
-                  margin:
-                  const EdgeInsets.symmetric(
+                  margin: const EdgeInsets.symmetric(
                     horizontal: 15,
                     vertical: 8,
                   ),
 
-                  child: ListTile(
+                  decoration: BoxDecoration(
 
-                    leading: const Icon(
-                      Icons.book,
-                      size: 40,
-                    ),
+                    borderRadius:
+                    BorderRadius.circular(20),
 
-                    title:
-                    Text(book.title),
+                    gradient: LinearGradient(
 
-                    subtitle: Column(
-                      crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
-
-                      children: [
-
-                        Text(
-                          book.author,
-                        ),
-
-                        Text(
-                          book.genre,
-                        ),
+                      colors: [
+                        Colors.blue.shade400,
+                        Colors.blue.shade700,
                       ],
                     ),
+                  ),
 
-                    trailing:
-                    const Icon(
-                      Icons
-                          .arrow_forward_ios,
+                  child: ListTile(
+
+                    contentPadding:
+                    const EdgeInsets.all(15),
+
+                    leading: Container(
+
+                      width: 60,
+                      height: 60,
+
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+
+                        borderRadius:
+                        BorderRadius.circular(15),
+                      ),
+
+                      child: const Icon(
+                        Icons.menu_book,
+                        size: 35,
+                        color: Colors.blue,
+                      ),
+                    ),
+
+                    title: Text(
+
+                      book.title,
+
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 8,
+                      ),
+
+                      child: Column(
+                        crossAxisAlignment:
+                        CrossAxisAlignment.start,
+
+                        children: [
+
+                          Text(
+                            book.author,
+
+                            style: const TextStyle(
+                              color: Colors.white70,
+                            ),
+                          ),
+
+                          Text(
+                            book.genre,
+
+                            style: const TextStyle(
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white,
                     ),
 
                     onTap: () {
@@ -177,9 +227,11 @@ class _HomeScreenState
 
                           builder: (_) =>
                               BookDetailsScreen(
+
                                 book: book,
-                                userData: widget.userData,
-                              )
+                                userData:
+                                widget.userData,
+                              ),
                         ),
                       );
                     },
