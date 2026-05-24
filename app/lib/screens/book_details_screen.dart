@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'pdf_screen.dart';
 import '../models/book.dart';
 import '../services/api_service.dart';
 
@@ -142,7 +142,38 @@ class BookDetailsScreen extends StatelessWidget {
 
               child: ElevatedButton.icon(
 
-                onPressed: () {},
+                onPressed: () {
+
+                  if (book.filePath.isEmpty) {
+
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+
+                      const SnackBar(
+                        content: Text(
+                          "PDF файл отсутствует",
+                        ),
+                      ),
+                    );
+
+                    return;
+                  }
+
+                  Navigator.push(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                      builder: (_) => PdfScreen(
+
+                        pdfUrl: book.filePath,
+
+                        title: book.title,
+                      ),
+                    ),
+                  );
+                },
 
                 icon: const Icon(Icons.book),
 
