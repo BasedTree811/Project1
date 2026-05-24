@@ -31,7 +31,9 @@ class _MainScreenState
         userData: widget.userData,
       ),
 
-      const FavoritesScreen(),
+       FavoritesScreen(
+        userData: widget.userData,
+      ),
     ];
 
     return Scaffold(
