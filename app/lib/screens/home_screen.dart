@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+import '../models/book.dart';
+import '../services/api_service.dart';
+
+class HomeScreen extends StatefulWidget {
 
   final Map userData;
 
@@ -10,54 +13,87 @@ class HomeScreen extends StatelessWidget {
   });
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  List<Book> books = [];
+
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    loadBooks();
+  }
+
+  void loadBooks() async {
+
+    books = await ApiService.getBooks();
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text("Электронная библиотека"),
+        title: const Text(
+          "Электронная библиотека",
+        ),
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(20),
+      body: isLoading
 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          ? const Center(
+        child: CircularProgressIndicator(),
+      )
 
-          children: [
+          : ListView.builder(
 
-            Text(
-              "Добро пожаловать, ${userData["name"]}",
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+        itemCount: books.length,
+
+        itemBuilder: (context, index) {
+
+          Book book = books[index];
+
+          return Card(
+
+            margin: const EdgeInsets.all(10),
+
+            child: ListTile(
+
+              leading: const Icon(
+                Icons.book,
+                size: 40,
+              ),
+
+              title: Text(book.title),
+
+              subtitle: Column(
+                crossAxisAlignment:
+                CrossAxisAlignment.start,
+
+                children: [
+
+                  Text(book.author),
+
+                  Text(book.genre),
+                ],
+              ),
+
+              trailing: const Icon(
+                Icons.arrow_forward_ios,
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            const Card(
-              child: ListTile(
-                leading: Icon(Icons.book),
-                title: Text("Каталог книг"),
-              ),
-            ),
-
-            const Card(
-              child: ListTile(
-                leading: Icon(Icons.favorite),
-                title: Text("Избранное"),
-              ),
-            ),
-
-            const Card(
-              child: ListTile(
-                leading: Icon(Icons.star),
-                title: Text("Рейтинг"),
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
