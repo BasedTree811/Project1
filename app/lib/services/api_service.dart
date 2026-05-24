@@ -82,4 +82,50 @@ class ApiService {
         .map((book) => Book.fromJson(book))
         .toList();
   }
+
+  // =========================
+  // ADD FAVORITE
+  // =========================
+
+  static Future addFavorite({
+    required String idUser,
+    required String idBook,
+  }) async {
+
+    var url = Uri.parse(
+      "$baseUrl/add_favorite.php",
+    );
+
+    var response = await http.post(
+      url,
+
+      body: {
+        "id_user": idUser,
+        "id_book": idBook,
+      },
+    );
+
+    return jsonDecode(response.body);
+  }
+
+  // =========================
+  // GET FAVORITES
+  // =========================
+
+  static Future<List<Book>> getFavorites(
+      String idUser,
+      ) async {
+
+    var url = Uri.parse(
+      "$baseUrl/get_favorites.php?id_user=$idUser",
+    );
+
+    var response = await http.get(url);
+
+    List data = jsonDecode(response.body);
+
+    return data
+        .map((book) => Book.fromJson(book))
+        .toList();
+  }
 }
