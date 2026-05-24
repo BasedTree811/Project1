@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'admin_screen.dart';
 import 'favorites_screen.dart';
 import 'home_screen.dart';
+import 'profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
 
@@ -31,10 +33,22 @@ class _MainScreenState
         userData: widget.userData,
       ),
 
-       FavoritesScreen(
+      FavoritesScreen(
+        userData: widget.userData,
+      ),
+
+      ProfileScreen(
         userData: widget.userData,
       ),
     ];
+
+    if (widget.userData["role"] ==
+        "admin") {
+
+      screens.add(
+        const AdminScreen(),
+      );
+    }
 
     return Scaffold(
 
@@ -52,17 +66,30 @@ class _MainScreenState
           });
         },
 
-        items: const [
+        items: [
 
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: "Главная",
           ),
 
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: "Избранное",
           ),
+
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Профиль",
+          ),
+
+          if (widget.userData["role"] ==
+              "admin")
+
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.admin_panel_settings),
+              label: "Admin",
+            ),
         ],
       ),
     );
