@@ -1,15 +1,35 @@
 import 'package:flutter/material.dart';
 
 import '../models/book.dart';
+import '../services/api_service.dart';
 
 class BookDetailsScreen extends StatelessWidget {
 
   final Book book;
+  final Map userData;
 
   const BookDetailsScreen({
     super.key,
     required this.book,
+    required this.userData,
   });
+
+  Future addFavorite(
+      BuildContext context,
+      ) async {
+
+    var result = await ApiService.addFavorite(
+
+      idUser: userData["id_user"],
+      idBook: book.id,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(result["message"]),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +38,18 @@ class BookDetailsScreen extends StatelessWidget {
 
       appBar: AppBar(
         title: Text(book.title),
+      ),
+
+      floatingActionButton:
+      FloatingActionButton(
+
+        onPressed: () {
+          addFavorite(context);
+        },
+
+        child: const Icon(
+          Icons.favorite,
+        ),
       ),
 
       body: Padding(
@@ -29,10 +61,23 @@ class BookDetailsScreen extends StatelessWidget {
 
           children: [
 
-            const Center(
-              child: Icon(
-                Icons.menu_book,
-                size: 120,
+            Center(
+              child: Container(
+
+                width: 140,
+                height: 180,
+
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade100,
+
+                  borderRadius:
+                  BorderRadius.circular(20),
+                ),
+
+                child: const Icon(
+                  Icons.menu_book,
+                  size: 90,
+                ),
               ),
             ),
 
@@ -47,7 +92,7 @@ class BookDetailsScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
 
             Text(
               "Автор: ${book.author}",
@@ -85,6 +130,7 @@ class BookDetailsScreen extends StatelessWidget {
 
               style: const TextStyle(
                 fontSize: 16,
+                height: 1.5,
               ),
             ),
 

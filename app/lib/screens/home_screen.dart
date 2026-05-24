@@ -178,7 +178,8 @@ class _HomeScreenState
                           builder: (_) =>
                               BookDetailsScreen(
                                 book: book,
-                              ),
+                                userData: widget.userData,
+                              )
                         ),
                       );
                     },
