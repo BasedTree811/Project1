@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
-import '../models/book.dart';
 import '../services/api_service.dart';
+
 import 'book_details_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen
+    extends StatefulWidget {
 
   final Map userData;
 
   const HomeScreen({
+
     super.key,
+
     required this.userData,
   });
 
@@ -21,47 +24,29 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState
     extends State<HomeScreen> {
 
-  List<Book> books = [];
-  List<Book> filteredBooks = [];
+  List books = [];
 
   bool isLoading = true;
 
   @override
   void initState() {
+
     super.initState();
 
     loadBooks();
   }
 
-  void loadBooks() async {
+  Future<void> loadBooks() async {
 
-    books = await ApiService.getBooks();
-
-    filteredBooks = books;
+    var data =
+    await ApiService.getBooks();
 
     setState(() {
+
+      books = data;
+
       isLoading = false;
     });
-  }
-
-  void searchBooks(String query) {
-
-    filteredBooks = books.where((book) {
-
-      return book.title
-          .toLowerCase()
-          .contains(
-        query.toLowerCase(),
-      ) ||
-          book.author
-              .toLowerCase()
-              .contains(
-            query.toLowerCase(),
-          );
-
-    }).toList();
-
-    setState(() {});
   }
 
   @override
@@ -70,177 +55,69 @@ class _HomeScreenState
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text(
-          "Электронная библиотека",
-        ),
+        title:
+        const Text("Библиотека"),
       ),
 
       body: isLoading
 
           ? const Center(
-        child: CircularProgressIndicator(),
+        child:
+        CircularProgressIndicator(),
       )
 
-          : Column(
-        children: [
+          : ListView.builder(
 
-          Padding(
-            padding:
-            const EdgeInsets.all(15),
+        itemCount: books.length,
 
-            child: TextField(
+        itemBuilder:
+            (context, index) {
 
-              onChanged: searchBooks,
+          var book = books[index];
 
-              decoration:
-              InputDecoration(
+          return Card(
 
-                hintText:
-                "Поиск книг...",
+            margin:
+            const EdgeInsets.all(
+                10),
 
-                prefixIcon:
-                const Icon(
-                  Icons.search,
-                ),
+            child: ListTile(
 
-                border:
-                OutlineInputBorder(
-                  borderRadius:
-                  BorderRadius.circular(
-                    15,
-                  ),
-                ),
+              title: Text(
+                book["title"],
               ),
-            ),
-          ),
 
-          Expanded(
-            child: ListView.builder(
+              subtitle: Text(
+                book["author"],
+              ),
 
-              itemCount:
-              filteredBooks.length,
+              trailing: const Icon(
+                Icons.arrow_forward,
+              ),
 
-              itemBuilder:
-                  (context, index) {
+              onTap: () {
 
-                Book book =
-                filteredBooks[index];
+                Navigator.push(
 
-                return Container(
+                  context,
 
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 8,
-                  ),
+                  MaterialPageRoute(
 
-                  decoration: BoxDecoration(
+                    builder: (_) =>
+                        BookDetailsScreen(
 
-                    borderRadius:
-                    BorderRadius.circular(20),
+                          book: book,
 
-                    gradient: LinearGradient(
-
-                      colors: [
-                        Colors.blue.shade400,
-                        Colors.blue.shade700,
-                      ],
-                    ),
-                  ),
-
-                  child: ListTile(
-
-                    contentPadding:
-                    const EdgeInsets.all(15),
-
-                    leading: Container(
-
-                      width: 60,
-                      height: 60,
-
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-
-                        borderRadius:
-                        BorderRadius.circular(15),
-                      ),
-
-                      child: const Icon(
-                        Icons.menu_book,
-                        size: 35,
-                        color: Colors.blue,
-                      ),
-                    ),
-
-                    title: Text(
-
-                      book.title,
-
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 8,
-                      ),
-
-                      child: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-
-                        children: [
-
-                          Text(
-                            book.author,
-
-                            style: const TextStyle(
-                              color: Colors.white70,
-                            ),
-                          ),
-
-                          Text(
-                            book.genre,
-
-                            style: const TextStyle(
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    trailing: const Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
-                    ),
-
-                    onTap: () {
-
-                      Navigator.push(
-
-                        context,
-
-                        MaterialPageRoute(
-
-                          builder: (_) =>
-                              BookDetailsScreen(
-
-                                book: book,
-                                userData:
-                                widget.userData,
-                              ),
+                          userData:
+                          widget
+                              .userData,
                         ),
-                      );
-                    },
                   ),
                 );
               },
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

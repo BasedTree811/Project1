@@ -1,43 +1,54 @@
 import 'package:flutter/material.dart';
 
-import '../models/book.dart';
 import '../services/api_service.dart';
 
-class FavoritesScreen extends StatefulWidget {
+class FavoritesScreen
+    extends StatefulWidget {
 
   final Map userData;
 
   const FavoritesScreen({
+
     super.key,
+
     required this.userData,
   });
 
   @override
-  State<FavoritesScreen> createState() =>
+  State<FavoritesScreen>
+  createState() =>
       _FavoritesScreenState();
 }
 
 class _FavoritesScreenState
     extends State<FavoritesScreen> {
 
-  List<Book> books = [];
+  List favorites = [];
 
   bool isLoading = true;
 
   @override
   void initState() {
+
     super.initState();
 
     loadFavorites();
   }
 
-  void loadFavorites() async {
+  Future<void> loadFavorites() async {
 
-    books = await ApiService.getFavorites(
-      widget.userData["id_user"],
+    var data =
+    await ApiService.getFavorites(
+
+      userId:
+      widget.userData["id"]
+          .toString(),
     );
 
     setState(() {
+
+      favorites = data;
+
       isLoading = false;
     });
   }
@@ -48,51 +59,43 @@ class _FavoritesScreenState
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text(
-          "Избранное",
-        ),
+        title:
+        const Text("Избранное"),
       ),
 
       body: isLoading
 
           ? const Center(
-        child: CircularProgressIndicator(),
-      )
-
-          : books.isEmpty
-
-          ? const Center(
-        child: Text(
-          "Избранных книг нет",
-        ),
+        child:
+        CircularProgressIndicator(),
       )
 
           : ListView.builder(
 
-        itemCount: books.length,
+        itemCount:
+        favorites.length,
 
         itemBuilder:
             (context, index) {
 
-          Book book = books[index];
+          var book =
+          favorites[index];
 
           return Card(
 
             margin:
-            const EdgeInsets.all(10),
+            const EdgeInsets.all(
+                10),
 
             child: ListTile(
 
-              leading: const Icon(
-                Icons.favorite,
-                color: Colors.red,
+              title: Text(
+                book["title"],
               ),
 
-              title:
-              Text(book.title),
-
-              subtitle:
-              Text(book.author),
+              subtitle: Text(
+                book["author"],
+              ),
             ),
           );
         },

@@ -7,7 +7,9 @@ class ChatScreen extends StatefulWidget {
   final Map userData;
 
   const ChatScreen({
+
     super.key,
+
     required this.userData,
   });
 
@@ -19,40 +21,47 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState
     extends State<ChatScreen> {
 
-  final controller =
+  List messages = [];
+
+  final TextEditingController
+  controller =
   TextEditingController();
 
-  List messages = [];
+  bool isLoading = true;
 
   @override
   void initState() {
+
     super.initState();
 
     loadMessages();
   }
 
-  void loadMessages() async {
+  Future<void> loadMessages() async {
 
-    messages =
-    await ApiService.getMessages(
-      widget.userData["id_user"],
-    );
+    var data =
+    await ApiService.getMessages();
 
-    setState(() {});
+    setState(() {
+
+      messages = data;
+
+      isLoading = false;
+    });
   }
 
-  void sendMessage() async {
+  Future<void> sendMessage() async {
 
-    if (controller.text.isEmpty) return;
+    if (controller.text.isEmpty) {
+      return;
+    }
 
     await ApiService.sendMessage(
 
-      idUser:
-      widget.userData["id_user"],
+      user:
+      widget.userData["login"],
 
       message: controller.text,
-
-      sender: "user",
     );
 
     controller.clear();
@@ -66,9 +75,7 @@ class _ChatScreenState
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text(
-          "Чат с библиотекарем",
-        ),
+        title: const Text("Чат"),
       ),
 
       body: Column(
@@ -77,7 +84,14 @@ class _ChatScreenState
 
           Expanded(
 
-            child: ListView.builder(
+            child: isLoading
+
+                ? const Center(
+              child:
+              CircularProgressIndicator(),
+            )
+
+                : ListView.builder(
 
               itemCount:
               messages.length,
@@ -85,57 +99,17 @@ class _ChatScreenState
               itemBuilder:
                   (context, index) {
 
-                var msg =
+                var message =
                 messages[index];
 
-                bool isUser =
-                    msg["sender"] ==
-                        "user";
+                return ListTile(
 
-                return Align(
+                  title: Text(
+                    message["user"],
+                  ),
 
-                  alignment: isUser
-
-                      ? Alignment
-                      .centerRight
-
-                      : Alignment
-                      .centerLeft,
-
-                  child: Container(
-
-                    margin:
-                    const EdgeInsets
-                        .all(10),
-
-                    padding:
-                    const EdgeInsets
-                        .all(15),
-
-                    decoration:
-                    BoxDecoration(
-
-                      color: isUser
-                          ? Colors.blue
-                          : Colors.grey
-                          .shade300,
-
-                      borderRadius:
-                      BorderRadius
-                          .circular(15),
-                    ),
-
-                    child: Text(
-
-                      msg["message"],
-
-                      style: TextStyle(
-
-                        color: isUser
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                    ),
+                  subtitle: Text(
+                    message["message"],
                   ),
                 );
               },
@@ -145,9 +119,7 @@ class _ChatScreenState
           Padding(
 
             padding:
-            const EdgeInsets.all(
-              10,
-            ),
+            const EdgeInsets.all(10),
 
             child: Row(
 
@@ -162,6 +134,7 @@ class _ChatScreenState
 
                     decoration:
                     const InputDecoration(
+
                       hintText:
                       "Введите сообщение",
                     ),

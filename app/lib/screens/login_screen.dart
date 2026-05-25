@@ -1,74 +1,120 @@
 import 'package:flutter/material.dart';
-import 'main_screen.dart';
+
 import '../services/api_service.dart';
+import 'admin_panel_screen.dart';
 import 'home_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+
+  const LoginScreen({
+    super.key,
+  });
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginScreen> createState() =>
+      _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState
+    extends State<LoginScreen> {
 
-  final loginController = TextEditingController();
-  final passwordController = TextEditingController();
+  final loginController =
+  TextEditingController();
+
+  final passwordController =
+  TextEditingController();
 
   bool isLoading = false;
 
   void login() async {
 
-    try {
+    if (loginController.text.isEmpty ||
+        passwordController.text.isEmpty) {
 
-      setState(() {
-        isLoading = true;
-      });
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
 
-      var result = await ApiService.loginUser(
-        login: loginController.text,
-        password: passwordController.text,
+        const SnackBar(
+
+          backgroundColor: Colors.red,
+
+          content: Text(
+            "Заполните все поля",
+          ),
+        ),
       );
 
-      setState(() {
-        isLoading = false;
-      });
+      return;
+    }
 
-      print(result);
+    setState(() {
+      isLoading = true;
+    });
 
-      if (result["success"] == true) {
+    var result =
+    await ApiService.loginUser(
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => MainScreen(
-              userData: result["user"],
-            ),
-          ),
-        );
+      login: loginController.text,
 
-      } else {
+      password:
+      passwordController.text,
+    );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result["message"]),
-          ),
-        );
-      }
+    if (!mounted) return;
 
-    } catch (e) {
+    setState(() {
+      isLoading = false;
+    });
 
-      setState(() {
-        isLoading = false;
-      });
+    if (result["success"] != true) {
 
-      print(e);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
 
-      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+
+          backgroundColor: Colors.red,
+
           content: Text(
-            "Ошибка подключения к серверу",
+            result["message"],
           ),
+        ),
+      );
+
+      return;
+    }
+
+    Map user =
+    result["user"];
+
+    if (user["role"] == "admin") {
+
+      Navigator.pushReplacement(
+
+        context,
+
+        MaterialPageRoute(
+
+          builder: (_) =>
+              AdminPanelScreen(
+                userData: user,
+              ),
+        ),
+      );
+
+    } else {
+
+      Navigator.pushReplacement(
+
+        context,
+
+        MaterialPageRoute(
+
+          builder: (_) =>
+              HomeScreen(
+                userData: user,
+              ),
         ),
       );
     }
@@ -79,53 +125,183 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
 
-      appBar: AppBar(
-        title: const Text("Авторизация"),
-      ),
+      body: Center(
 
-      body: Padding(
-        padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
 
-        child: Column(
-          children: [
+          padding:
+          const EdgeInsets.all(
+            25,
+          ),
 
-            const SizedBox(height: 30),
+          child: Column(
 
-            TextField(
-              controller: loginController,
-              decoration: const InputDecoration(
-                labelText: "Логин",
-                border: OutlineInputBorder(),
+            mainAxisAlignment:
+            MainAxisAlignment.center,
+
+            children: [
+
+              // =====================
+              // LOGO
+              // =====================
+
+              const Icon(
+
+                Icons.menu_book,
+
+                size: 100,
+
+                color: Colors.blue,
               ),
-            ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            TextField(
-              controller: passwordController,
-              obscureText: true,
+              const Text(
 
-              decoration: const InputDecoration(
-                labelText: "Пароль",
-                border: OutlineInputBorder(),
+                "Электронная библиотека",
+
+                style: TextStyle(
+
+                  fontSize: 28,
+
+                  fontWeight:
+                  FontWeight.bold,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 40),
 
-            SizedBox(
-              width: double.infinity,
-              height: 50,
+              // =====================
+              // LOGIN
+              // =====================
 
-              child: ElevatedButton(
-                onPressed: isLoading ? null : login,
+              TextField(
 
-                child: isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text("Войти"),
+                controller:
+                loginController,
+
+                decoration:
+                InputDecoration(
+
+                  labelText: "Логин",
+
+                  border:
+                  OutlineInputBorder(
+
+                    borderRadius:
+                    BorderRadius
+                        .circular(
+                      15,
+                    ),
+                  ),
+
+                  prefixIcon:
+                  const Icon(
+                    Icons.person,
+                  ),
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 20),
+
+              // =====================
+              // PASSWORD
+              // =====================
+
+              TextField(
+
+                controller:
+                passwordController,
+
+                obscureText: true,
+
+                decoration:
+                InputDecoration(
+
+                  labelText:
+                  "Пароль",
+
+                  border:
+                  OutlineInputBorder(
+
+                    borderRadius:
+                    BorderRadius
+                        .circular(
+                      15,
+                    ),
+                  ),
+
+                  prefixIcon:
+                  const Icon(
+                    Icons.lock,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // =====================
+              // LOGIN BUTTON
+              // =====================
+
+              SizedBox(
+
+                width: double.infinity,
+                height: 55,
+
+                child: ElevatedButton(
+
+                  onPressed:
+                  isLoading
+                      ? null
+                      : login,
+
+                  child: isLoading
+
+                      ? const CircularProgressIndicator(
+                    color:
+                    Colors.white,
+                  )
+
+                      : const Text(
+
+                    "Войти",
+
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              // =====================
+              // REGISTER
+              // =====================
+
+              TextButton(
+
+                onPressed: () {
+
+                  Navigator.push(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                      builder: (_) =>
+                      const RegisterScreen(),
+                    ),
+                  );
+                },
+
+                child: const Text(
+                  "Нет аккаунта? Регистрация",
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

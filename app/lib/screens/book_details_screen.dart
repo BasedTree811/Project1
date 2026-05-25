@@ -1,35 +1,21 @@
 import 'package:flutter/material.dart';
-import 'pdf_screen.dart';
-import '../models/book.dart';
+
 import '../services/api_service.dart';
 
 class BookDetailsScreen extends StatelessWidget {
 
-  final Book book;
+  final dynamic book;
+
   final Map userData;
 
   const BookDetailsScreen({
+
     super.key,
+
     required this.book,
+
     required this.userData,
   });
-
-  Future addFavorite(
-      BuildContext context,
-      ) async {
-
-    var result = await ApiService.addFavorite(
-
-      idUser: userData["id_user"],
-      idBook: book.id,
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(result["message"]),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,54 +23,23 @@ class BookDetailsScreen extends StatelessWidget {
     return Scaffold(
 
       appBar: AppBar(
-        title: Text(book.title),
-      ),
-
-      floatingActionButton:
-      FloatingActionButton(
-
-        onPressed: () {
-          addFavorite(context);
-        },
-
-        child: const Icon(
-          Icons.favorite,
-        ),
+        title: Text(book["title"]),
       ),
 
       body: Padding(
+
         padding: const EdgeInsets.all(20),
 
         child: Column(
+
           crossAxisAlignment:
           CrossAxisAlignment.start,
 
           children: [
 
-            Center(
-              child: Container(
-
-                width: 140,
-                height: 180,
-
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade100,
-
-                  borderRadius:
-                  BorderRadius.circular(20),
-                ),
-
-                child: const Icon(
-                  Icons.menu_book,
-                  size: 90,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
             Text(
-              book.title,
+
+              book["title"],
 
               style: const TextStyle(
                 fontSize: 28,
@@ -92,94 +47,73 @@ class BookDetailsScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
 
             Text(
-              "Автор: ${book.author}",
-
+              "Автор: ${book["author"]}",
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 20,
               ),
             ),
 
             const SizedBox(height: 10),
 
             Text(
-              "Жанр: ${book.genre}",
-
+              "Жанр: ${book["genre"]}",
               style: const TextStyle(
                 fontSize: 18,
               ),
             ),
 
-            const SizedBox(height: 25),
-
-            const Text(
-              "Описание",
-
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
 
             Text(
-              book.description,
-
+              book["description"] ?? "",
               style: const TextStyle(
                 fontSize: 16,
-                height: 1.5,
               ),
             ),
 
-            const Spacer(),
+            const SizedBox(height: 30),
 
-            SizedBox(
-              width: double.infinity,
-              height: 55,
+            ElevatedButton(
 
-              child: ElevatedButton.icon(
+              onPressed: () async {
 
-                onPressed: () {
+                var result =
+                await ApiService
+                    .addFavorite(
 
-                  if (book.filePath.isEmpty) {
+                  userId:
+                  userData["id"]
+                      .toString(),
 
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(
+                  bookId:
+                  book["id"]
+                      .toString(),
+                );
 
-                      const SnackBar(
-                        content: Text(
-                          "PDF файл отсутствует",
-                        ),
-                      ),
-                    );
+                if (!context.mounted) {
+                  return;
+                }
 
-                    return;
-                  }
+                ScaffoldMessenger.of(
+                    context)
+                    .showSnackBar(
 
-                  Navigator.push(
+                  SnackBar(
 
-                    context,
+                    content: Text(
 
-                    MaterialPageRoute(
-
-                      builder: (_) => PdfScreen(
-
-                        pdfUrl: book.filePath,
-
-                        title: book.title,
-                      ),
+                      result["message"] ??
+                          "Добавлено в избранное",
                     ),
-                  );
-                },
+                  ),
+                );
+              },
 
-                icon: const Icon(Icons.book),
-
-                label: const Text(
-                  "Читать книгу",
-                ),
+              child: const Text(
+                "В избранное",
               ),
             ),
           ],

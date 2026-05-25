@@ -1,13 +1,15 @@
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../services/api_service.dart';
-import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
-File? selectedPdf;
 class AddBookScreen extends StatefulWidget {
 
-  const AddBookScreen({super.key});
+  const AddBookScreen({
+    super.key,
+  });
 
   @override
   State<AddBookScreen> createState() =>
@@ -29,77 +31,209 @@ class _AddBookScreenState
   final descriptionController =
   TextEditingController();
 
-  final pdfController =
-  TextEditingController();
+  Uint8List? pdfBytes;
+
+  String pdfName = "";
 
   bool isLoading = false;
 
-  void addBook() async {
+  // =========================
+  // PICK PDF
+  // =========================
+
+  Future pickPdf() async {
+
+    FilePickerResult? result =
+    await FilePicker.platform.pickFiles(
+
+      type: FileType.custom,
+
+      allowedExtensions: ['pdf'],
+
+      withData: true,
+    );
+
+    if (result != null) {
+
+      setState(() {
+
+        pdfBytes =
+            result.files.first.bytes;
+
+        pdfName =
+            result.files.first.name;
+      });
+    }
+  }
+
+  // =========================
+  // ADD BOOK
+  // =========================
+
+  Future addBook() async {
+
+    if (titleController.text.isEmpty ||
+        authorController.text.isEmpty ||
+        genreController.text.isEmpty ||
+        descriptionController.text.isEmpty) {
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        const SnackBar(
+
+          backgroundColor: Colors.red,
+
+          content: Text(
+            "Заполните все поля",
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    if (pdfBytes == null) {
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        const SnackBar(
+
+          backgroundColor: Colors.red,
+
+          content: Text(
+            "Выберите PDF файл",
+          ),
+        ),
+      );
+
+      return;
+    }
 
     setState(() {
       isLoading = true;
     });
-    void pickPdf() async {
 
-      FilePickerResult? result =
-      await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-      );
+    try {
 
-      if (result != null) {
-
-        selectedPdf = File(
-          result.files.single.path!,
-        );
-
-        setState(() {});
-      }
-    }
-    String pdfUrl = '';
-
-    if (selectedPdf != null) {
+      // =====================
+      // UPLOAD PDF
+      // =====================
 
       var uploadResult =
-      await ApiService.uploadPdf(
-        selectedPdf!,
+      await ApiService.uploadPdfWeb(
+
+        pdfBytes: pdfBytes!,
+        fileName: pdfName,
       );
 
-      if (uploadResult["success"] == true) {
+      if (!mounted) return;
 
-        pdfUrl =
-        uploadResult["file_path"];
+      if (uploadResult["success"] != true) {
+
+        setState(() {
+          isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+
+          SnackBar(
+
+            backgroundColor: Colors.red,
+
+            content: Text(
+              uploadResult["message"],
+            ),
+          ),
+        );
+
+        return;
       }
-    }
 
-    var result =
-    await ApiService.addBook(
+      String filePath =
+      uploadResult["file_path"];
 
-      title: titleController.text,
+      // =====================
+      // ADD BOOK
+      // =====================
 
-      author: authorController.text,
+      var result =
+      await ApiService.addBook(
 
-      genre: genreController.text,
+        title: titleController.text,
 
-      description:
-      descriptionController.text,
+        author: authorController.text,
 
-      filePath: pdfUrl,
-    );
+        genre: genreController.text,
 
-    setState(() {
-      isLoading = false;
-    });
+        description:
+        descriptionController.text,
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
+        filePath: filePath,
+      );
 
-      SnackBar(
-        content: Text(
-          result["message"],
+      if (!mounted) return;
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (result["success"] == true) {
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+
+          const SnackBar(
+
+            backgroundColor: Colors.green,
+
+            content: Text(
+              "Книга добавлена",
+            ),
+          ),
+        );
+
+        Navigator.pop(context);
+
+      } else {
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+
+          SnackBar(
+
+            backgroundColor: Colors.red,
+
+            content: Text(
+              result["message"],
+            ),
+          ),
+        );
+      }
+
+    } catch (e) {
+
+      if (!mounted) return;
+
+      setState(() {
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        SnackBar(
+
+          backgroundColor: Colors.red,
+
+          content: Text(
+            "Ошибка: $e",
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   @override
@@ -109,7 +243,7 @@ class _AddBookScreenState
 
       appBar: AppBar(
         title: const Text(
-          "Добавление книги",
+          "Добавить книгу",
         ),
       ),
 
@@ -123,12 +257,13 @@ class _AddBookScreenState
           children: [
 
             TextField(
-              controller: titleController,
+              controller:
+              titleController,
 
               decoration:
               const InputDecoration(
                 labelText:
-                "Название книги",
+                "Название",
               ),
             ),
 
@@ -162,28 +297,41 @@ class _AddBookScreenState
               controller:
               descriptionController,
 
-              maxLines: 5,
+              maxLines: 4,
 
               decoration:
               const InputDecoration(
-                labelText:
-                "Описание",
+                labelText: "Описание",
               ),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 25),
 
-            TextField(
-              controller: pdfController,
+            SizedBox(
 
-              decoration:
-              const InputDecoration(
-                labelText:
-                "Ссылка на PDF",
+              width: double.infinity,
+              height: 55,
+
+              child: ElevatedButton.icon(
+
+                onPressed: pickPdf,
+
+                icon: const Icon(
+                  Icons.upload_file,
+                ),
+
+                label: Text(
+
+                  pdfName.isEmpty
+
+                      ? "Выбрать PDF"
+
+                      : pdfName,
+                ),
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 25),
 
             SizedBox(
 
@@ -199,7 +347,10 @@ class _AddBookScreenState
 
                 child: isLoading
 
-                    ? const CircularProgressIndicator()
+                    ? const CircularProgressIndicator(
+                  color:
+                  Colors.white,
+                )
 
                     : const Text(
                   "Добавить книгу",

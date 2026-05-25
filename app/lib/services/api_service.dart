@@ -1,355 +1,466 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 
-import '../models/book.dart';
-
 class ApiService {
+
+  // =========================
+  // BASE URL
+  // =========================
 
   static const String baseUrl =
       "http://localhost/library_api";
 
   // =========================
-  // REGISTER
+  // LOGIN USER
   // =========================
 
-  static Future registerUser({
+  static Future<Map<String, dynamic>>
+  loginUser({
 
-    required String surname,
-    required String name,
-    required String email,
     required String login,
+
     required String password,
 
   }) async {
 
-    var url = Uri.parse(
-      "$baseUrl/register.php",
-    );
+    try {
 
-    var response = await http.post(
+      var response = await http.post(
 
-      url,
+        Uri.parse(
+          "$baseUrl/login.php",
+        ),
 
-      body: {
+        body: {
 
-        "surname": surname,
-        "name": name,
-        "email": email,
-        "login": login,
-        "password": password,
-      },
-    );
+          "login": login,
 
-    return jsonDecode(response.body);
+          "password": password,
+        },
+      );
+
+      return jsonDecode(response.body);
+
+    } catch (e) {
+
+      return {
+
+        "success": false,
+
+        "message":
+        "Ошибка подключения"
+      };
+    }
   }
 
   // =========================
-  // LOGIN
+  // REGISTER USER
   // =========================
 
-  static Future loginUser({
+  static Future<Map<String, dynamic>>
+  registerUser({
+
+    required String surname,
+
+    required String name,
+
+    required String email,
 
     required String login,
+
     required String password,
 
   }) async {
 
-    var url = Uri.parse(
-      "$baseUrl/login.php",
-    );
+    try {
 
-    var response = await http.post(
+      var response = await http.post(
 
-      url,
+        Uri.parse(
+          "$baseUrl/register.php",
+        ),
 
-      body: {
+        body: {
 
-        "login": login,
-        "password": password,
-      },
-    );
+          "surname": surname,
 
-    return jsonDecode(response.body);
+          "name": name,
+
+          "email": email,
+
+          "login": login,
+
+          "password": password,
+        },
+      );
+
+      return jsonDecode(response.body);
+
+    } catch (e) {
+
+      return {
+
+        "success": false,
+
+        "message":
+        "Ошибка подключения"
+      };
+    }
   }
 
   // =========================
   // GET BOOKS
   // =========================
 
-  static Future<List<Book>> getBooks()
-  async {
+  static Future<List<dynamic>>
+  getBooks() async {
 
-    var url = Uri.parse(
-      "$baseUrl/get_books.php",
-    );
+    try {
 
-    var response = await http.get(url);
+      var response = await http.get(
 
-    List data = jsonDecode(response.body);
+        Uri.parse(
+          "$baseUrl/get_books.php",
+        ),
+      );
 
-    return data
-        .map((book) =>
-        Book.fromJson(book))
-        .toList();
-  }
+      return jsonDecode(response.body);
 
-  // =========================
-  // ADD FAVORITE
-  // =========================
+    } catch (e) {
 
-  static Future addFavorite({
-
-    required String idUser,
-    required String idBook,
-
-  }) async {
-
-    var url = Uri.parse(
-      "$baseUrl/add_favorite.php",
-    );
-
-    var response = await http.post(
-
-      url,
-
-      body: {
-
-        "id_user": idUser,
-        "id_book": idBook,
-      },
-    );
-
-    return jsonDecode(response.body);
-  }
-
-  // =========================
-  // GET FAVORITES
-  // =========================
-
-  static Future<List<Book>>
-  getFavorites(
-      String idUser,
-      ) async {
-
-    var url = Uri.parse(
-      "$baseUrl/get_favorites.php?id_user=$idUser",
-    );
-
-    var response = await http.get(url);
-
-    List data = jsonDecode(response.body);
-
-    return data
-        .map((book) =>
-        Book.fromJson(book))
-        .toList();
+      return [];
+    }
   }
 
   // =========================
   // ADD BOOK
   // =========================
 
-  static Future addBook({
+  static Future<Map<String, dynamic>>
+  addBook({
 
     required String title,
+
     required String author,
+
     required String genre,
+
     required String description,
+
     required String filePath,
 
   }) async {
 
-    var url = Uri.parse(
-      "$baseUrl/add_book.php",
-    );
+    try {
 
-    var response = await http.post(
+      var response = await http.post(
 
-      url,
+        Uri.parse(
+          "$baseUrl/add_book.php",
+        ),
 
-      body: {
+        body: {
 
-        "title": title,
-        "author": author,
-        "genre": genre,
-        "description": description,
-        "file_path": filePath,
-      },
-    );
+          "title": title,
 
-    return jsonDecode(response.body);
-  }
+          "author": author,
 
-  // =========================
-  // DELETE BOOK
-  // =========================
+          "genre": genre,
 
-  static Future deleteBook(
-      String id,
-      ) async {
+          "description": description,
 
-    var url = Uri.parse(
-      "$baseUrl/delete_book.php",
-    );
+          "file_path": filePath,
+        },
+      );
 
-    var response = await http.post(
+      return jsonDecode(response.body);
 
-      url,
+    } catch (e) {
 
-      body: {
-        "id": id,
-      },
-    );
+      return {
 
-    return jsonDecode(response.body);
+        "success": false,
+
+        "message":
+        "Ошибка добавления"
+      };
+    }
   }
 
   // =========================
   // UPDATE BOOK
   // =========================
 
-  static Future updateBook({
+  static Future<Map<String, dynamic>>
+  updateBook({
 
     required String id,
+
     required String title,
+
     required String author,
+
     required String genre,
+
     required String description,
 
   }) async {
 
-    var url = Uri.parse(
-      "$baseUrl/update_book.php",
-    );
+    try {
 
-    var response = await http.post(
+      var response = await http.post(
 
-      url,
+        Uri.parse(
+          "$baseUrl/update_book.php",
+        ),
 
-      body: {
+        body: {
 
-        "id": id,
-        "title": title,
-        "author": author,
-        "genre": genre,
-        "description": description,
-      },
-    );
+          "id": id,
 
-    return jsonDecode(response.body);
+          "title": title,
+
+          "author": author,
+
+          "genre": genre,
+
+          "description": description,
+        },
+      );
+
+      return jsonDecode(response.body);
+
+    } catch (e) {
+
+      return {
+
+        "success": false,
+      };
+    }
   }
 
   // =========================
-  // UPLOAD PDF
+  // DELETE BOOK
   // =========================
 
-  static Future uploadPdf(
-      File file,
-      ) async {
+  static Future<Map<String, dynamic>>
+  deleteBook({
 
-    var uri = Uri.parse(
-      "$baseUrl/upload_pdf.php",
-    );
-
-    var request =
-    http.MultipartRequest(
-      'POST',
-      uri,
-    );
-
-    request.files.add(
-
-      await http.MultipartFile
-          .fromPath(
-        'pdf',
-        file.path,
-      ),
-    );
-
-    var response =
-    await request.send();
-
-    var responseData =
-    await response.stream
-        .bytesToString();
-
-    return jsonDecode(responseData);
-  }
-
-  // =========================
-  // ADD HISTORY
-  // =========================
-
-  static Future addHistory({
-
-    required String idUser,
-    required String idBook,
+    required String id,
 
   }) async {
 
-    var url = Uri.parse(
-      "$baseUrl/add_history.php",
-    );
+    try {
 
-    await http.post(
+      var response = await http.post(
 
-      url,
+        Uri.parse(
+          "$baseUrl/delete_book.php",
+        ),
 
-      body: {
+        body: {
 
-        "id_user": idUser,
-        "id_book": idBook,
-      },
-    );
+          "id": id,
+        },
+      );
+
+      return jsonDecode(response.body);
+
+    } catch (e) {
+
+      return {
+
+        "success": false,
+      };
+    }
   }
 
   // =========================
-  // SEND MESSAGE
+  // FAVORITES
   // =========================
 
-  static Future sendMessage({
+  static Future<Map<String, dynamic>>
+  addFavorite({
 
-    required String idUser,
+    required String userId,
+
+    required String bookId,
+
+  }) async {
+
+    try {
+
+      var response = await http.post(
+
+        Uri.parse(
+          "$baseUrl/add_favorite.php",
+        ),
+
+        body: {
+
+          "user_id": userId,
+
+          "book_id": bookId,
+        },
+      );
+
+      return jsonDecode(response.body);
+
+    } catch (e) {
+
+      return {
+
+        "success": false,
+      };
+    }
+  }
+
+  static Future<List<dynamic>>
+  getFavorites({
+
+    required String userId,
+
+  }) async {
+
+    try {
+
+      var response = await http.post(
+
+        Uri.parse(
+          "$baseUrl/get_favorites.php",
+        ),
+
+        body: {
+
+          "user_id": userId,
+        },
+      );
+
+      return jsonDecode(response.body);
+
+    } catch (e) {
+
+      return [];
+    }
+  }
+
+  // =========================
+  // CHAT
+  // =========================
+
+  static Future<List<dynamic>>
+  getMessages() async {
+
+    try {
+
+      var response = await http.get(
+
+        Uri.parse(
+          "$baseUrl/get_messages.php",
+        ),
+      );
+
+      return jsonDecode(response.body);
+
+    } catch (e) {
+
+      return [];
+    }
+  }
+
+  static Future<Map<String, dynamic>>
+  sendMessage({
+
+    required String user,
+
     required String message,
-    required String sender,
 
   }) async {
 
-    var url = Uri.parse(
-      "$baseUrl/send_message.php",
-    );
+    try {
 
-    var response = await http.post(
+      var response = await http.post(
 
-      url,
+        Uri.parse(
+          "$baseUrl/send_message.php",
+        ),
 
-      body: {
+        body: {
 
-        "id_user": idUser,
-        "message": message,
-        "sender": sender,
-      },
-    );
+          "user": user,
 
-    return jsonDecode(response.body);
+          "message": message,
+        },
+      );
+
+      return jsonDecode(response.body);
+
+    } catch (e) {
+
+      return {
+
+        "success": false,
+      };
+    }
   }
 
   // =========================
-  // GET MESSAGES
+  // PDF UPLOAD
   // =========================
 
-  static Future<List> getMessages(
-      String idUser,
-      ) async {
+  static Future<Map<String, dynamic>>
+  uploadPdfWeb({
 
-    var url = Uri.parse(
-      "$baseUrl/get_messages.php?id_user=$idUser",
-    );
+    required Uint8List pdfBytes,
 
-    var response = await http.get(url);
+    required String fileName,
 
-    return jsonDecode(response.body);
+  }) async {
+
+    try {
+
+      var uri = Uri.parse(
+        "$baseUrl/upload_pdf.php",
+      );
+
+      var request =
+      http.MultipartRequest(
+        'POST',
+        uri,
+      );
+
+      request.files.add(
+
+        http.MultipartFile.fromBytes(
+
+          'pdf',
+
+          pdfBytes,
+
+          filename: fileName,
+        ),
+      );
+
+      var response =
+      await request.send();
+
+      var responseBody =
+      await response.stream
+          .bytesToString();
+
+      return jsonDecode(responseBody);
+
+    } catch (e) {
+
+      return {
+
+        "success": false,
+
+        "message":
+        "Ошибка загрузки PDF"
+      };
+    }
   }
 }
