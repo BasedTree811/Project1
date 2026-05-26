@@ -149,6 +149,49 @@ class _HomeScreenState
                   const EdgeInsets.all(10),
 
                   child: ListTile(
+                    trailing:
+                    widget.userData["role"] == "admin"
+
+                        ? Row(
+
+                      mainAxisSize:
+                      MainAxisSize.min,
+
+                      children: [
+
+                        IconButton(
+
+                          icon: const Icon(
+                            Icons.edit,
+                          ),
+
+                          onPressed: () {
+
+                          },
+                        ),
+
+                        IconButton(
+
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+
+                          onPressed: () async {
+
+                            await ApiService.deleteBook(
+                              id: book.id,
+                            );
+
+                            loadBooks();
+                          },
+                        ),
+                      ],
+                    )
+
+                        : const Icon(
+                      Icons.arrow_forward_ios,
+                    ),
 
                     title:
                     Text(book.title),
@@ -159,10 +202,8 @@ class _HomeScreenState
 
                     isThreeLine: true,
 
-                    trailing:
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                    ),
+
+
 
                     onTap: () {
 
