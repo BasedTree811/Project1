@@ -1,18 +1,29 @@
 class Book {
 
   final String id;
+
   final String title;
+
   final String author;
+
   final String genre;
+
   final String description;
+
   final String filePath;
 
   Book({
+
     required this.id,
+
     required this.title,
+
     required this.author,
+
     required this.genre,
+
     required this.description,
+
     required this.filePath,
   });
 
@@ -22,17 +33,19 @@ class Book {
 
     return Book(
 
-      id: json['id_book'],
+      id: json["id_book"].toString(),
 
-      title: json['title'],
+      title: json["title"] ?? "",
 
-      author: json['author'],
+      author: json["author"] ?? "",
 
-      genre: json['genre'],
+      genre: json["genre"] ?? "",
 
-      description: json['description'],
+      description:
+      json["description"] ?? "",
 
-      filePath: json['file_path'] ?? '',
+      filePath:
+      json["file_path"] ?? "",
     );
   }
 }

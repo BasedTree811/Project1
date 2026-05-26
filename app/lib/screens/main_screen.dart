@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'admin_screen.dart';
-import 'favorites_screen.dart';
 import 'home_screen.dart';
+import 'favorites_screen.dart';
+import 'chat_screen.dart';
 import 'profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -24,10 +24,14 @@ class _MainScreenState
 
   int currentIndex = 0;
 
-  @override
-  Widget build(BuildContext context) {
+  late List screens;
 
-    List screens = [
+  @override
+  void initState() {
+
+    super.initState();
+
+    screens = [
 
       HomeScreen(
         userData: widget.userData,
@@ -37,18 +41,18 @@ class _MainScreenState
         userData: widget.userData,
       ),
 
+      ChatScreen(
+        userData: widget.userData,
+      ),
+
       ProfileScreen(
         userData: widget.userData,
       ),
     ];
+  }
 
-    if (widget.userData["role"] ==
-        "admin") {
-
-      screens.add(
-        const AdminScreen(),
-      );
-    }
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
 
@@ -62,34 +66,40 @@ class _MainScreenState
         onTap: (index) {
 
           setState(() {
+
             currentIndex = index;
           });
         },
 
-        items: [
+        items: const [
 
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
+
             icon: Icon(Icons.home),
+
             label: "Главная",
           ),
 
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
+
             icon: Icon(Icons.favorite),
+
             label: "Избранное",
           ),
 
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Профиль",
+          BottomNavigationBarItem(
+
+            icon: Icon(Icons.chat),
+
+            label: "Чат",
           ),
 
-          if (widget.userData["role"] ==
-              "admin")
+          BottomNavigationBarItem(
 
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.admin_panel_settings),
-              label: "Admin",
-            ),
+            icon: Icon(Icons.person),
+
+            label: "Профиль",
+          ),
         ],
       ),
     );

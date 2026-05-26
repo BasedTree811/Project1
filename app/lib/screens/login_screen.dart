@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'main_screen.dart';
 import '../services/api_service.dart';
 import 'admin_panel_screen.dart';
 import 'home_screen.dart';
@@ -112,9 +112,9 @@ class _LoginScreenState
         MaterialPageRoute(
 
           builder: (_) =>
-              HomeScreen(
-                userData: user,
-              ),
+              MainScreen(
+                userData: result["user"],
+              )
         ),
       );
     }

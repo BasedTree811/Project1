@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+
 import '../services/api_service.dart';
 
 class BookDetailsScreen extends StatelessWidget {
@@ -20,103 +22,131 @@ class BookDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    String filePath =
+        book["file_path"] ?? "";
+
     return Scaffold(
 
       appBar: AppBar(
-        title: Text(book["title"]),
+        title: Text(
+          book["title"] ?? "",
+        ),
       ),
 
-      body: Padding(
+      body: SingleChildScrollView(
 
-        padding: const EdgeInsets.all(20),
+        child: Padding(
 
-        child: Column(
+          padding: const EdgeInsets.all(20),
 
-          crossAxisAlignment:
-          CrossAxisAlignment.start,
+          child: Column(
 
-          children: [
+            crossAxisAlignment:
+            CrossAxisAlignment.start,
 
-            Text(
+            children: [
 
-              book["title"],
+              Text(
 
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+                book["title"] ?? "",
+
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            Text(
-              "Автор: ${book["author"]}",
-              style: const TextStyle(
-                fontSize: 20,
+              Text(
+
+                "Автор: ${book["author"]}",
+
+                style: const TextStyle(
+                  fontSize: 20,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-            Text(
-              "Жанр: ${book["genre"]}",
-              style: const TextStyle(
-                fontSize: 18,
+              Text(
+
+                "Жанр: ${book["genre"]}",
+
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            Text(
-              book["description"] ?? "",
-              style: const TextStyle(
-                fontSize: 16,
+              Text(
+                book["description"] ?? "",
               ),
-            ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            ElevatedButton(
+              ElevatedButton(
 
-              onPressed: () async {
+                onPressed: () async {
 
-                var result =
-                await ApiService
-                    .addFavorite(
+                  var result =
+                  await ApiService
+                      .addFavorite(
 
-                  userId:
-                  userData["id"]
-                      .toString(),
+                    userId:
+                    userData["id_user"]
+                        .toString(),
 
-                  bookId:
-                  book["id"]
-                      .toString(),
-                );
+                    bookId:
+                    book["id_book"]
+                        .toString(),
+                  );
 
-                if (!context.mounted) {
-                  return;
-                }
+                  if (!context.mounted) {
+                    return;
+                  }
 
-                ScaffoldMessenger.of(
-                    context)
-                    .showSnackBar(
+                  ScaffoldMessenger.of(
+                      context)
+                      .showSnackBar(
 
-                  SnackBar(
+                    SnackBar(
 
-                    content: Text(
+                      content: Text(
 
-                      result["message"] ??
-                          "Добавлено в избранное",
+                        result["message"] ??
+                            "Добавлено",
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
 
-              child: const Text(
-                "В избранное",
+                child: const Text(
+                  "В избранное",
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 30),
+
+              if(filePath.isNotEmpty)
+
+                SizedBox(
+
+                  height: 600,
+
+                  child: SfPdfViewer.network(
+                    filePath,
+                  ),
+                )
+
+              else
+
+                const Text(
+                  "PDF файл отсутствует",
+                ),
+            ],
+          ),
         ),
       ),
     );

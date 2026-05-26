@@ -138,44 +138,61 @@ class ApiService {
   // ADD BOOK
   // =========================
 
+// ======================
+// ADD BOOK
+// ======================
+
   static Future<Map<String, dynamic>>
   addBook({
 
     required String title,
-
     required String author,
-
     required String genre,
-
     required String description,
-
     required String filePath,
 
   }) async {
 
     try {
 
-      var response = await http.post(
+      var request =
+      http.MultipartRequest(
+
+        "POST",
 
         Uri.parse(
           "$baseUrl/add_book.php",
         ),
-
-        body: {
-
-          "title": title,
-
-          "author": author,
-
-          "genre": genre,
-
-          "description": description,
-
-          "file_path": filePath,
-        },
       );
 
-      return jsonDecode(response.body);
+      request.fields["title"] =
+          title;
+
+      request.fields["author"] =
+          author;
+
+      request.fields["genre"] =
+          genre;
+
+      request.fields["description"] =
+          description;
+
+      request.files.add(
+
+        await http.MultipartFile
+            .fromPath(
+          "pdf",
+          filePath,
+        ),
+      );
+
+      var response =
+      await request.send();
+
+      var responseData =
+      await response.stream.bytesToString();
+
+      return jsonDecode(responseData);
 
     } catch (e) {
 
@@ -184,7 +201,7 @@ class ApiService {
         "success": false,
 
         "message":
-        "Ошибка добавления"
+        "Ошибка: $e",
       };
     }
   }
