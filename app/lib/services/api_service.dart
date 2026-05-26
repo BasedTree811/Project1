@@ -10,7 +10,7 @@ class ApiService {
   // =========================
 
   static const String baseUrl =
-      "http://localhost/library_api";
+      "http://127.0.0.1/library_api";
 
   // =========================
   // LOGIN USER
