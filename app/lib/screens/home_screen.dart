@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../models/book.dart';
 import '../services/api_service.dart';
 
 import 'book_details_screen.dart';
 
-class HomeScreen
-    extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
 
   final Map userData;
 
   const HomeScreen({
-
     super.key,
-
     required this.userData,
   });
 
@@ -24,7 +22,9 @@ class HomeScreen
 class _HomeScreenState
     extends State<HomeScreen> {
 
-  List books = [];
+  List<Book> books = [];
+
+  List<Book> filteredBooks = [];
 
   bool isLoading = true;
 
@@ -45,7 +45,38 @@ class _HomeScreenState
 
       books = data;
 
+      filteredBooks = data;
+
       isLoading = false;
+    });
+  }
+
+  void searchBooks(String query) {
+
+    final results = books.where((book) {
+
+      final title =
+      book.title.toLowerCase();
+
+      final author =
+      book.author.toLowerCase();
+
+      final genre =
+      book.genre.toLowerCase();
+
+      final input =
+      query.toLowerCase();
+
+      return
+        title.contains(input) ||
+            author.contains(input) ||
+            genre.contains(input);
+
+    }).toList();
+
+    setState(() {
+
+      filteredBooks = results;
     });
   }
 
@@ -55,8 +86,9 @@ class _HomeScreenState
     return Scaffold(
 
       appBar: AppBar(
-        title:
-        const Text("Библиотека"),
+        title: const Text(
+          "Электронная библиотека",
+        ),
       ),
 
       body: isLoading
@@ -66,58 +98,115 @@ class _HomeScreenState
         CircularProgressIndicator(),
       )
 
-          : ListView.builder(
+          : Column(
 
-        itemCount: books.length,
+        children: [
 
-        itemBuilder:
-            (context, index) {
+          Padding(
 
-          var book = books[index];
+            padding:
+            const EdgeInsets.all(10),
 
-          return Card(
+            child: TextField(
 
-            margin:
-            const EdgeInsets.all(
-                10),
+              onChanged: searchBooks,
 
-            child: ListTile(
+              decoration:
+              InputDecoration(
 
-              title: Text(
-                book["title"],
+                hintText:
+                "Поиск книг...",
+
+                prefixIcon:
+                const Icon(Icons.search),
+
+                border:
+                OutlineInputBorder(
+
+                  borderRadius:
+                  BorderRadius.circular(12),
+                ),
               ),
+            ),
+          ),
 
-              subtitle: Text(
-                book["author"],
-              ),
+          Expanded(
 
-              trailing: const Icon(
-                Icons.arrow_forward,
-              ),
+            child: ListView.builder(
 
-              onTap: () {
+              itemCount:
+              filteredBooks.length,
 
-                Navigator.push(
+              itemBuilder:
+                  (context, index) {
 
-                  context,
+                final book =
+                filteredBooks[index];
 
-                  MaterialPageRoute(
+                return Card(
 
-                    builder: (_) =>
-                        BookDetailsScreen(
+                  margin:
+                  const EdgeInsets.all(10),
 
-                          book: book,
+                  child: ListTile(
 
-                          userData:
-                          widget
-                              .userData,
+                    title:
+                    Text(book.title),
+
+                    subtitle: Text(
+                      "${book.author}\n${book.genre}",
+                    ),
+
+                    isThreeLine: true,
+
+                    trailing:
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                    ),
+
+                    onTap: () {
+
+                      Navigator.push(
+
+                        context,
+
+                        MaterialPageRoute(
+
+                          builder: (_) =>
+                              BookDetailsScreen(
+
+                                book: {
+                                  "id_book":
+                                  book.id,
+
+                                  "title":
+                                  book.title,
+
+                                  "author":
+                                  book.author,
+
+                                  "genre":
+                                  book.genre,
+
+                                  "description":
+                                  book.description,
+
+                                  "file_path":
+                                  book.filePath,
+                                },
+
+                                userData:
+                                widget.userData,
+                              ),
                         ),
+                      );
+                    },
                   ),
                 );
               },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
