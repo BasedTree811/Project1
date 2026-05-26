@@ -316,7 +316,7 @@ class ApiService {
 
     try {
 
-      var response = await http.post(
+      final response = await http.post(
 
         Uri.parse(
           "$baseUrl/add_favorite.php",
@@ -324,9 +324,9 @@ class ApiService {
 
         body: {
 
-          "user_id": userId,
+          "id_user": userId,
 
-          "book_id": bookId,
+          "id_book": bookId,
         },
       );
 
@@ -335,8 +335,7 @@ class ApiService {
     } catch (e) {
 
       return {
-
-        "success": false,
+        "success": false
       };
     }
   }
