@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
+import '../models/book.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -114,19 +114,26 @@ class ApiService {
   // GET BOOKS
   // =========================
 
-  static Future<List<dynamic>>
-  getBooks() async {
+  static Future<List<Book>> getBooks() async {
 
     try {
 
-      var response = await http.get(
-
-        Uri.parse(
-          "$baseUrl/get_books.php",
-        ),
+      final response = await http.get(
+        Uri.parse("$baseUrl/get_books.php"),
       );
 
-      return jsonDecode(response.body);
+      if (response.statusCode == 200) {
+
+        List data = jsonDecode(response.body);
+
+        return data
+            .map((json) => Book.fromJson(json))
+            .toList();
+
+      } else {
+
+        return [];
+      }
 
     } catch (e) {
 
