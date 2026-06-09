@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
-
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../services/api_service.dart';
 
 class BookDetailsScreen extends StatelessWidget {
 
   final dynamic book;
-
   final Map userData;
 
   const BookDetailsScreen({
-
     super.key,
-
     required this.book,
-
     required this.userData,
   });
+
+  Future<void> openPdf(String url) async {
+
+    final uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +67,7 @@ class BookDetailsScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               Text(
-
                 "Автор: ${book["author"]}",
-
                 style: const TextStyle(
                   fontSize: 20,
                 ),
@@ -70,9 +76,7 @@ class BookDetailsScreen extends StatelessWidget {
               const SizedBox(height: 10),
 
               Text(
-
                 "Жанр: ${book["genre"]}",
-
                 style: const TextStyle(
                   fontSize: 18,
                 ),
@@ -91,8 +95,7 @@ class BookDetailsScreen extends StatelessWidget {
                 onPressed: () async {
 
                   var result =
-                  await ApiService
-                      .addFavorite(
+                  await ApiService.addFavorite(
 
                     userId:
                     userData["id_user"]
@@ -103,20 +106,16 @@ class BookDetailsScreen extends StatelessWidget {
                         .toString(),
                   );
 
-                  if (!context.mounted) {
-                    return;
-                  }
+                  if (!context.mounted) return;
 
-                  ScaffoldMessenger.of(
-                      context)
+                  ScaffoldMessenger.of(context)
                       .showSnackBar(
 
                     SnackBar(
 
                       content: Text(
-
                         result["message"] ??
-                            "Добавлено",
+                            "Добавлено в избранное",
                       ),
                     ),
                   );
@@ -127,16 +126,27 @@ class BookDetailsScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
-              if(filePath.isNotEmpty)
+              if (filePath.isNotEmpty)
 
                 SizedBox(
 
-                  height: 600,
+                  width: double.infinity,
 
-                  child: SfPdfViewer.network(
-                    filePath,
+                  child: ElevatedButton.icon(
+
+                    icon: const Icon(
+                      Icons.picture_as_pdf,
+                    ),
+
+                    label: const Text(
+                      "Открыть PDF",
+                    ),
+
+                    onPressed: () {
+                      openPdf(filePath);
+                    },
                   ),
                 )
 
