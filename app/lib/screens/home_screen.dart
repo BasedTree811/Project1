@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../models/book.dart';
 import '../services/api_service.dart';
 
-import 'borrowings_screen.dart';
 import 'book_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
+
   final Map userData;
 
   const HomeScreen({
@@ -30,24 +30,30 @@ class _HomeScreenState
 
   @override
   void initState() {
+
     super.initState();
+
     loadBooks();
   }
 
   Future<void> loadBooks() async {
+
     var data =
     await ApiService.getBooks();
 
     setState(() {
+
       books = data;
+
       filteredBooks = data;
+
       isLoading = false;
     });
   }
 
   void searchBooks(String query) {
-    final results =
-    books.where((book) {
+
+    final results = books.where((book) {
 
       final title =
       book.title.toLowerCase();
@@ -61,19 +67,22 @@ class _HomeScreenState
       final input =
       query.toLowerCase();
 
-      return title.contains(input) ||
-          author.contains(input) ||
-          genre.contains(input);
+      return
+        title.contains(input) ||
+            author.contains(input) ||
+            genre.contains(input);
 
     }).toList();
 
     setState(() {
+
       filteredBooks = results;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
 
       appBar: AppBar(
@@ -93,47 +102,8 @@ class _HomeScreenState
 
         children: [
 
-          const SizedBox(height: 10),
-
           Padding(
-            padding:
-            const EdgeInsets.symmetric(
-              horizontal: 10,
-            ),
 
-            child: SizedBox(
-              width: double.infinity,
-
-              child: ElevatedButton(
-
-                onPressed: () {
-
-                  Navigator.push(
-
-                    context,
-
-                    MaterialPageRoute(
-
-                      builder: (_) =>
-                          BorrowingsScreen(
-
-                            userId:
-                            widget.userData[
-                            "id_user"]
-                                .toString(),
-                          ),
-                    ),
-                  );
-                },
-
-                child: const Text(
-                  "Выданные книги",
-                ),
-              ),
-            ),
-          ),
-
-          Padding(
             padding:
             const EdgeInsets.all(10),
 
@@ -148,16 +118,13 @@ class _HomeScreenState
                 "Поиск книг...",
 
                 prefixIcon:
-                const Icon(
-                  Icons.search,
-                ),
+                const Icon(Icons.search),
 
                 border:
                 OutlineInputBorder(
 
                   borderRadius:
-                  BorderRadius
-                      .circular(12),
+                  BorderRadius.circular(12),
                 ),
               ),
             ),
@@ -165,8 +132,7 @@ class _HomeScreenState
 
           Expanded(
 
-            child:
-            ListView.builder(
+            child: ListView.builder(
 
               itemCount:
               filteredBooks.length,
@@ -180,49 +146,40 @@ class _HomeScreenState
                 return Card(
 
                   margin:
-                  const EdgeInsets
-                      .all(10),
+                  const EdgeInsets.all(10),
 
                   child: ListTile(
-
                     trailing:
-                    widget.userData[
-                    "role"] ==
-                        "admin"
+                    widget.userData["role"] == "admin"
 
                         ? Row(
 
                       mainAxisSize:
-                      MainAxisSize
-                          .min,
+                      MainAxisSize.min,
 
                       children: [
 
                         IconButton(
 
-                          icon:
-                          const Icon(
+                          icon: const Icon(
                             Icons.edit,
                           ),
 
-                          onPressed:
-                              () {},
+                          onPressed: () {
+
+                          },
                         ),
 
                         IconButton(
 
-                          icon:
-                          const Icon(
+                          icon: const Icon(
                             Icons.delete,
-                            color:
-                            Colors.red,
+                            color: Colors.red,
                           ),
 
-                          onPressed:
-                              () async {
+                          onPressed: () async {
 
-                            await ApiService
-                                .deleteBook(
+                            await ApiService.deleteBook(
                               id: book.id,
                             );
 
@@ -233,19 +190,20 @@ class _HomeScreenState
                     )
 
                         : const Icon(
-                      Icons
-                          .arrow_forward_ios,
+                      Icons.arrow_forward_ios,
                     ),
 
                     title:
                     Text(book.title),
 
-                    subtitle:
-                    Text(
+                    subtitle: Text(
                       "${book.author}\n${book.genre}",
                     ),
 
                     isThreeLine: true,
+
+
+
 
                     onTap: () {
 
@@ -259,7 +217,6 @@ class _HomeScreenState
                               BookDetailsScreen(
 
                                 book: {
-
                                   "id_book":
                                   book.id,
 

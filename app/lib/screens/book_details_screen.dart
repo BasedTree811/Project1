@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../services/api_service.dart';
 
 class BookDetailsScreen extends StatelessWidget {
+
   final dynamic book;
   final Map userData;
 
@@ -14,9 +15,11 @@ class BookDetailsScreen extends StatelessWidget {
   });
 
   Future<void> openPdf(String url) async {
+
     final uri = Uri.parse(url);
 
     if (await canLaunchUrl(uri)) {
+
       await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
@@ -26,27 +29,38 @@ class BookDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String filePath = book["file_path"] ?? "";
+
+    String filePath =
+        book["file_path"] ?? "";
 
     return Scaffold(
+
       appBar: AppBar(
         title: Text(
           book["title"] ?? "",
         ),
       ),
+
       body: SingleChildScrollView(
+
         child: Padding(
+
           padding: const EdgeInsets.all(20),
+
           child: Column(
+
             crossAxisAlignment:
             CrossAxisAlignment.start,
+
             children: [
+
               Text(
+
                 book["title"] ?? "",
+
                 style: const TextStyle(
                   fontSize: 28,
-                  fontWeight:
-                  FontWeight.bold,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
 
@@ -76,101 +90,68 @@ class BookDetailsScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // ИЗБРАННОЕ
+              ElevatedButton(
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    var result =
-                    await ApiService.addFavorite(
-                      userId: userData["id_user"]
-                          .toString(),
-                      bookId: book["id_book"]
-                          .toString(),
-                    );
+                onPressed: () async {
 
-                    if (!context.mounted) {
-                      return;
-                    }
+                  var result =
+                  await ApiService.addFavorite(
 
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          result["message"] ??
-                              "Добавлено в избранное",
-                        ),
+                    userId:
+                    userData["id_user"]
+                        .toString(),
+
+                    bookId:
+                    book["id_book"]
+                        .toString(),
+                  );
+
+                  if (!context.mounted) return;
+
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(
+
+                    SnackBar(
+
+                      content: Text(
+                        result["message"] ??
+                            "Добавлено в избранное",
                       ),
-                    );
-                  },
-                  child: const Text(
-                    "В избранное",
-                  ),
+                    ),
+                  );
+                },
+
+                child: const Text(
+                  "В избранное",
                 ),
               ),
 
-              const SizedBox(height: 15),
-
-              // ВЫДАТЬ КНИГУ
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-
-                    var result =
-                    await ApiService.borrowBook(
-
-                      userId:
-                      userData["id_user"]
-                          .toString(),
-
-                      bookId:
-                      book["id_book"]
-                          .toString(),
-                    );
-
-                    if (!context.mounted) {
-                      return;
-                    }
-
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          result["message"] ??
-                              "Книга выдана",
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    "Выдать книгу",
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // ОТКРЫТЬ PDF
+              const SizedBox(height: 20),
 
               if (filePath.isNotEmpty)
+
                 SizedBox(
+
                   width: double.infinity,
+
                   child: ElevatedButton.icon(
+
                     icon: const Icon(
                       Icons.picture_as_pdf,
                     ),
+
                     label: const Text(
                       "Открыть PDF",
                     ),
+
                     onPressed: () {
                       openPdf(filePath);
                     },
                   ),
                 )
+
               else
+
                 const Text(
                   "PDF файл отсутствует",
                 ),
