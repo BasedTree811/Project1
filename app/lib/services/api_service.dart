@@ -140,6 +140,41 @@ class ApiService {
       return [];
     }
   }
+  static Future<List<dynamic>>
+  getBorrowings(String userId) async {
+
+    final response = await http.get(
+
+      Uri.parse(
+        "$baseUrl/get_borrowings.php?user_id=$userId",
+      ),
+    );
+
+    return jsonDecode(response.body);
+  }
+  static Future<Map<String,dynamic>>
+  borrowBook({
+
+    required String userId,
+    required String bookId,
+
+  }) async {
+
+    var response = await http.post(
+
+      Uri.parse(
+        "$baseUrl/borrow_book.php",
+      ),
+
+      body: {
+
+        "user_id": userId,
+        "book_id": bookId,
+      },
+    );
+
+    return jsonDecode(response.body);
+  }
 
   // =========================
   // ADD BOOK
