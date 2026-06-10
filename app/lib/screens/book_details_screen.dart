@@ -98,7 +98,7 @@ class BookDetailsScreen extends StatelessWidget {
                   await ApiService.addFavorite(
 
                     userId:
-                    userData["id_user"]
+                    userData["id"]
                         .toString(),
 
                     bookId:
@@ -144,7 +144,17 @@ class BookDetailsScreen extends StatelessWidget {
                       "Открыть PDF",
                     ),
 
-                    onPressed: () {
+                    onPressed: () async {
+
+                      await ApiService.addHistory(
+
+                        userId:
+                        userData["id_user"]
+                            .toString(),
+                        bookId:
+                        book["id_book"].toString(),
+                      );
+
                       openPdf(filePath);
                     },
                   ),

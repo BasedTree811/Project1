@@ -1,11 +1,56 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
-class HistoryScreen
-    extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
+
+  final Map userData;
 
   const HistoryScreen({
     super.key,
+    required this.userData,
   });
+
+  @override
+  State<HistoryScreen> createState() =>
+      _HistoryScreenState();
+}
+
+class _HistoryScreenState
+    extends State<HistoryScreen> {
+
+  List history = [];
+
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadHistory();
+  }
+
+  Future loadHistory() async {
+
+
+
+    var data =
+    await ApiService.getHistory(
+
+      userId:
+      widget.userData["id_user"]
+          .toString(),
+    );
+
+    setState(() {
+
+      history = data;
+
+      isLoading = false;
+    });
+    print(widget.userData);
+    print(data);
+    print(widget.userData);
+    print(widget.userData["id_user"]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,32 +63,53 @@ class HistoryScreen
         ),
       ),
 
-      body: ListView(
+      body: isLoading
 
-        children: const [
+          ? const Center(
+        child:
+        CircularProgressIndicator(),
+      )
 
-          ListTile(
-            leading:
-            Icon(Icons.history),
+          : history.isEmpty
 
-            title:
-            Text("Гарри Поттер"),
+          ? const Center(
+        child: Text(
+          "История пуста",
+        ),
+      )
 
-            subtitle:
-            Text("Прочитано"),
-          ),
+          : ListView.builder(
 
-          ListTile(
-            leading:
-            Icon(Icons.history),
+        itemCount:
+        history.length,
 
-            title:
-            Text("Война и мир"),
+        itemBuilder:
+            (context, index) {
 
-            subtitle:
-            Text("Прочитано"),
-          ),
-        ],
+          var book =
+          history[index];
+
+          return Card(
+
+            margin:
+            const EdgeInsets.all(10),
+
+            child: ListTile(
+
+              leading: const Icon(
+                Icons.history,
+              ),
+
+              title: Text(
+                book["title"] ?? "",
+              ),
+
+              subtitle: Text(
+                book["author"] ?? "",
+              ),
+            ),
+          );
+        },
       ),
     );
   }

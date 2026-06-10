@@ -87,6 +87,8 @@ class _LoginScreenState
 
     Map user =
     result["user"];
+    print(result);
+    print(user);
 
     if (user["role"] == "admin") {
 

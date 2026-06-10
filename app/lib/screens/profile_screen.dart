@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'chat_screen.dart';
 import 'history_screen.dart';
 import 'login_screen.dart';
 import 'rating_screen.dart';
@@ -172,8 +171,9 @@ class ProfileScreen extends StatelessWidget {
 
                     MaterialPageRoute(
 
-                      builder: (_) =>
-                      const HistoryScreen(),
+                      builder: (_) => HistoryScreen(
+                        userData: userData,
+                      ),
                     ),
                   );
                 },
@@ -213,42 +213,6 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 15),
-
-            SizedBox(
-
-              width: double.infinity,
-              height: 55,
-
-              child: ElevatedButton.icon(
-
-                icon: const Icon(
-                  Icons.chat,
-                ),
-
-                label: const Text(
-                  "Чат с библиотекарем",
-                ),
-
-                onPressed: () {
-
-                  Navigator.push(
-
-                    context,
-
-                    MaterialPageRoute(
-
-                      builder: (_) =>
-                          ChatScreen(
-                            userData: userData,
-                          ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 40),
 
             // =====================
             // LOGOUT

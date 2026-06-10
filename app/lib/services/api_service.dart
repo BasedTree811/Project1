@@ -392,10 +392,74 @@ class ApiService {
       };
     }
   }
+  static Future addHistory({
+    required String userId,
+    required String bookId,
+  }) async {
+
+    await http.post(
+
+      Uri.parse(
+        "$baseUrl/add_history.php",
+      ),
+
+      body: {
+        "id_user": userId,
+        "id_book": bookId,
+      },
+    );
+  }
+
+  static Future<List<dynamic>>
+  getHistory({
+    required String userId,
+  }) async {
+
+    try {
+
+      var response = await http.post(
+
+        Uri.parse(
+          "$baseUrl/get_history.php",
+        ),
+
+        body: {
+          "id_user": userId,
+        },
+      );
+
+      return jsonDecode(response.body);
+
+    } catch (e) {
+
+      return [];
+    }
+  }
 
   // =========================
   // PDF UPLOAD
   // =========================
+  static Future<List<dynamic>>
+  getRating() async {
+
+    try {
+
+      var response = await http.get(
+
+        Uri.parse(
+          "$baseUrl/get_rating.php",
+        ),
+      );
+
+      return jsonDecode(
+        response.body,
+      );
+
+    } catch (e) {
+
+      return [];
+    }
+  }
 
   static Future<Map<String, dynamic>>
   uploadPdfWeb({

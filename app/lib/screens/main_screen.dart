@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-
+import 'history_screen.dart';
 import 'home_screen.dart';
 import 'favorites_screen.dart';
-import 'chat_screen.dart';
 import 'profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
-
   final Map userData;
 
   const MainScreen({
@@ -28,7 +26,6 @@ class _MainScreenState
 
   @override
   void initState() {
-
     super.initState();
 
     screens = [
@@ -41,7 +38,7 @@ class _MainScreenState
         userData: widget.userData,
       ),
 
-      ChatScreen(
+      HistoryScreen(
         userData: widget.userData,
       ),
 
@@ -58,8 +55,14 @@ class _MainScreenState
 
       body: screens[currentIndex],
 
-      bottomNavigationBar:
-      BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
+
+        backgroundColor: Colors.blue,
+
+        selectedItemColor: Colors.white,
+
+        unselectedItemColor:
+        Colors.white70,
 
         currentIndex: currentIndex,
 
@@ -74,30 +77,22 @@ class _MainScreenState
         items: const [
 
           BottomNavigationBarItem(
-
             icon: Icon(Icons.home),
-
             label: "Главная",
           ),
 
           BottomNavigationBarItem(
-
             icon: Icon(Icons.favorite),
-
             label: "Избранное",
           ),
 
           BottomNavigationBarItem(
-
-            icon: Icon(Icons.chat),
-
-            label: "Чат",
+            icon: Icon(Icons.history),
+            label: "История",
           ),
 
           BottomNavigationBarItem(
-
             icon: Icon(Icons.person),
-
             label: "Профиль",
           ),
         ],

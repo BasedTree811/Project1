@@ -41,7 +41,7 @@ class _FavoritesScreenState
     await ApiService.getFavorites(
 
       userId:
-      widget.userData["id"]
+      widget.userData["id_user"]
           .toString(),
     );
 
