@@ -20,6 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Book> books = [];
   List<Book> filteredBooks = [];
   bool isLoading = true;
+  final _titleController = TextEditingController();
+  final _genreController = TextEditingController();
 
   @override
   void initState() {
@@ -27,28 +29,41 @@ class _HomeScreenState extends State<HomeScreen> {
     loadBooks();
   }
 
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _genreController.dispose();
+    super.dispose();
+  }
+
   Future<void> loadBooks() async {
     var data = await ApiService.getBooks();
     setState(() {
       books = data;
-      filteredBooks = data;
       isLoading = false;
     });
+    applyFilters();
   }
 
-  void searchBooks(String query) {
-    final results = books.where((book) {
-      final title = book.title.toLowerCase();
-      final author = book.author.toLowerCase();
-      final genre = book.genre.toLowerCase();
-      final input = query.toLowerCase();
-      return title.contains(input) ||
-          author.contains(input) ||
-          genre.contains(input);
+  void applyFilters() {
+    final titleQuery = _titleController.text.toLowerCase().trim();
+    final genreQuery = _genreController.text.toLowerCase().trim();
+
+    filteredBooks = books.where((book) {
+      final matchesTitle =
+          titleQuery.isEmpty || book.title.toLowerCase().contains(titleQuery);
+      final matchesGenre =
+          genreQuery.isEmpty || book.genre.toLowerCase().contains(genreQuery);
+      return matchesTitle && matchesGenre;
     }).toList();
-    setState(() {
-      filteredBooks = results;
-    });
+
+    setState(() {});
+  }
+
+  void clearFilters() {
+    _titleController.clear();
+    _genreController.clear();
+    applyFilters();
   }
 
   @override
@@ -75,31 +90,74 @@ class _HomeScreenState extends State<HomeScreen> {
       )
           : Column(
         children: [
-          // Поле поиска
+          // Поиск по названию и жанру
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              onChanged: searchBooks,
-              decoration: InputDecoration(
-                hintText: "Поиск книг...",
-                hintStyle: TextStyle(color: Colors.grey.shade500),
-                prefixIcon: const Icon(Icons.search, color: Colors.deepPurple),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _titleController,
+                  onChanged: (_) => applyFilters(),
+                  decoration: InputDecoration(
+                    hintText: "Поиск по названию",
+                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    prefixIcon: const Icon(Icons.title, color: Colors.deepPurple),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _genreController,
+                  onChanged: (_) => applyFilters(),
+                  decoration: InputDecoration(
+                    hintText: "Поиск по жанру",
+                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    prefixIcon: const Icon(Icons.category, color: Colors.deepPurple),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  ),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              ),
+                if (_titleController.text.isNotEmpty ||
+                    _genreController.text.isNotEmpty)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: clearFilters,
+                      icon: const Icon(Icons.clear, size: 18),
+                      label: const Text("Сбросить"),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.deepPurple,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
 
