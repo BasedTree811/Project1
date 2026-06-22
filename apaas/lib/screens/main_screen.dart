@@ -58,6 +58,11 @@ class _MainScreenState extends State<MainScreen> {
             onTap: (index) {
               setState(() {
                 currentIndex = index;
+                if (index == 1) {
+                  screens[1] = FavoritesScreen(userData: widget.userData);
+                } else if (index == 2) {
+                  screens[2] = HistoryScreen(userData: widget.userData);
+                }
               });
             },
             type: BottomNavigationBarType.fixed,

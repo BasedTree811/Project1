@@ -194,6 +194,8 @@ class ApiService {
 
     required String description,
 
+    required String filePath,
+
   }) async {
 
     try {
@@ -206,7 +208,7 @@ class ApiService {
 
         body: {
 
-          "id": id,
+          "id_book": id,
 
           "title": title,
 
@@ -215,6 +217,8 @@ class ApiService {
           "genre": genre,
 
           "description": description,
+
+          "file_path": filePath,
         },
       );
 
@@ -250,7 +254,7 @@ class ApiService {
 
         body: {
 
-          "id": id,
+          "id_book": id,
         },
       );
 
@@ -321,7 +325,7 @@ class ApiService {
 
         body: {
 
-          "user_id": userId,
+          "id_user": userId,
         },
       );
 
@@ -462,7 +466,7 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>>
-  uploadPdfWeb({
+  uploadPdf({
 
     required Uint8List pdfBytes,
 
@@ -514,4 +518,9 @@ class ApiService {
       };
     }
   }
+
+  static Future<Map<String, dynamic>> uploadPdfWeb({
+    required Uint8List pdfBytes,
+    required String fileName,
+  }) => uploadPdf(pdfBytes: pdfBytes, fileName: fileName);
 }

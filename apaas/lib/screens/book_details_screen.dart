@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../services/api_service.dart';
+import 'pdf_viewer_screen.dart';
 
 class BookDetailsScreen extends StatelessWidget {
   final dynamic book;
@@ -12,19 +12,20 @@ class BookDetailsScreen extends StatelessWidget {
     required this.userData,
   });
 
-  Future<void> openPdf(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
-    }
+  void openPdfViewer(BuildContext context, String url, String title) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PdfViewerScreen(
+          url: url,
+          title: title,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Безопасное извлечение данных
     final title = book["title"]?.toString() ?? "Без названия";
     final author = book["author"]?.toString() ?? "Неизвестный автор";
     final genre = book["genre"]?.toString() ?? "Не указан";
@@ -32,7 +33,7 @@ class BookDetailsScreen extends StatelessWidget {
     final filePath = book["file_path"]?.toString() ?? "";
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50, // единый фон
+      backgroundColor: Colors.grey.shade50,
 
       appBar: AppBar(
         title: Text(
@@ -50,7 +51,6 @@ class BookDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // --- Основная карточка с информацией ---
             Card(
               elevation: 6,
               shape: RoundedRectangleBorder(
@@ -62,7 +62,6 @@ class BookDetailsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Заголовок книги
                     Text(
                       title,
                       style: const TextStyle(
@@ -72,8 +71,6 @@ class BookDetailsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-
-                    // Автор
                     Row(
                       children: [
                         const Icon(Icons.person, size: 20, color: Colors.deepPurple),
@@ -85,8 +82,6 @@ class BookDetailsScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-
-                    // Жанр
                     Row(
                       children: [
                         const Icon(Icons.category, size: 20, color: Colors.deepPurple),
@@ -98,13 +93,8 @@ class BookDetailsScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 20),
-
-                    // Разделитель
                     const Divider(color: Colors.grey, thickness: 1),
-
                     const SizedBox(height: 16),
-
-                    // Описание с заголовком
                     const Text(
                       "Описание",
                       style: TextStyle(
@@ -125,7 +115,6 @@ class BookDetailsScreen extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // --- Кнопка "В избранное" (стилизованная под акцент) ---
             SizedBox(
               height: 55,
               child: ElevatedButton.icon(
@@ -136,7 +125,7 @@ class BookDetailsScreen extends StatelessWidget {
                 ),
                 onPressed: () async {
                   final result = await ApiService.addFavorite(
-                    userId: userData["id"]?.toString() ?? userData["id_user"]?.toString() ?? "",
+                    userId: userData["id_user"]?.toString() ?? "",
                     bookId: book["id_book"]?.toString() ?? "",
                   );
 
@@ -164,22 +153,24 @@ class BookDetailsScreen extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // --- Кнопка "Открыть PDF" (если файл есть) ---
             if (filePath.isNotEmpty)
               SizedBox(
                 height: 55,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.picture_as_pdf, size: 26),
                   label: const Text(
-                    "Открыть PDF",
+                    "Читать PDF",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                   onPressed: () async {
                     await ApiService.addHistory(
-                      userId: userData["id_user"]?.toString() ?? userData["id"]?.toString() ?? "",
+                      userId: userData["id_user"]?.toString() ?? "",
                       bookId: book["id_book"]?.toString() ?? "",
                     );
-                    openPdf(filePath);
+
+                    if (!context.mounted) return;
+
+                    openPdfViewer(context, filePath, title);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
@@ -193,7 +184,6 @@ class BookDetailsScreen extends StatelessWidget {
                 ),
               )
             else
-            // Если PDF отсутствует – показываем информативный блок
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(

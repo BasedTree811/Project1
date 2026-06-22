@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/book.dart';
 import '../services/api_service.dart';
+import '../widgets/pdf_upload_field.dart';
 
 class EditBookScreen extends StatefulWidget {
   final Book book;
@@ -19,6 +20,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
   late TextEditingController authorController;
   late TextEditingController genreController;
   late TextEditingController descriptionController;
+  late TextEditingController pdfController;
 
   bool isLoading = false;
 
@@ -29,6 +31,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
     authorController = TextEditingController(text: widget.book.author);
     genreController = TextEditingController(text: widget.book.genre);
     descriptionController = TextEditingController(text: widget.book.description);
+    pdfController = TextEditingController(text: widget.book.filePath);
   }
 
   @override
@@ -37,6 +40,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
     authorController.dispose();
     genreController.dispose();
     descriptionController.dispose();
+    pdfController.dispose();
     super.dispose();
   }
 
@@ -45,7 +49,8 @@ class _EditBookScreenState extends State<EditBookScreen> {
     if (titleController.text.isEmpty ||
         authorController.text.isEmpty ||
         genreController.text.isEmpty ||
-        descriptionController.text.isEmpty) {
+        descriptionController.text.isEmpty ||
+        pdfController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Заполните все поля"),
@@ -65,6 +70,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
         author: authorController.text,
         genre: genreController.text,
         description: descriptionController.text,
+        filePath: pdfController.text,
       );
 
       if (!mounted) return;
@@ -164,8 +170,11 @@ class _EditBookScreenState extends State<EditBookScreen> {
                       label: 'Описание',
                       icon: Icons.description,
                       maxLines: 4,
-                      textInputAction: TextInputAction.done,
+                      textInputAction: TextInputAction.next,
                     ),
+                    const SizedBox(height: 16),
+
+                    PdfUploadField(controller: pdfController),
                   ],
                 ),
               ),

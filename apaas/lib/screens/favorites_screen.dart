@@ -56,6 +56,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           color: Colors.deepPurple,
         ),
       )
+          : favorites.isEmpty
+          ? const Center(
+        child: Text(
+          "Избранное пусто",
+          style: TextStyle(
+            fontSize: 18,
+            color: Colors.grey,
+          ),
+        ),
+      )
           : ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         itemCount: favorites.length,

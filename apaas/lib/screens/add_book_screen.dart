@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../widgets/pdf_upload_field.dart';
 
 class AddBookScreen extends StatefulWidget {
   const AddBookScreen({super.key});
@@ -137,13 +138,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Поле "Ссылка на PDF"
-                    _buildTextField(
-                      controller: pdfController,
-                      label: 'Ссылка на PDF',
-                      icon: Icons.link,
-                      textInputAction: TextInputAction.done,
-                    ),
+                    PdfUploadField(controller: pdfController),
                   ],
                 ),
               ),
@@ -187,7 +182,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
             // 4. Небольшая подсказка (дополнительный UX)
             Center(
               child: Text(
-                'Все поля обязательны для заполнения',
+                'Заполните все поля и загрузите PDF',
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontSize: 13,

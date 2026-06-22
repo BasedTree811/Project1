@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/book.dart';
 import '../services/api_service.dart';
 import 'book_details_screen.dart';
+import 'edit_book_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Map userData;
@@ -212,10 +213,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                // Кнопка редактирования (без функционала)
                                 IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.grey),
-                                  onPressed: () {},
+                                  icon: const Icon(Icons.edit, color: Colors.deepPurple),
+                                  onPressed: () async {
+                                    final updated = await Navigator.push<bool>(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => EditBookScreen(book: book),
+                                      ),
+                                    );
+                                    if (updated == true) {
+                                      loadBooks();
+                                    }
+                                  },
                                   splashRadius: 24,
                                 ),
                                 // Кнопка удаления
