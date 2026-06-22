@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Июн 10 2026 г., 22:18
+-- Время создания: Июн 22 2026 г., 11:39
 -- Версия сервера: 10.4.32-MariaDB
 -- Версия PHP: 8.2.12
 
@@ -42,15 +42,14 @@ CREATE TABLE `books` (
 --
 
 INSERT INTO `books` (`id_book`, `title`, `author`, `genre`, `publish_year`, `description`, `file_path`) VALUES
-(7, 'Гарри Поттер', 'Дж. К. Роулинг', 'Фэнтези', NULL, 'История юного волшебника', 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf'),
-(8, 'Война и мир', 'Лев Толстой', 'Роман', NULL, 'Классическое произведение', 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf'),
+(7, 'Гарри Поттер', 'Дж. К. Роулинг', 'Фэнтези', NULL, 'История юного меня', 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf'),
+(8, 'Война и мир (том 1)', 'Лев Толстой', 'Роман', NULL, 'Классическое произведение', 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf'),
 (9, 'Преступление и наказание', 'Федор Достоевский', 'Роман', NULL, 'Психологический роман', 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf'),
 (10, '1984', 'Джордж Оруэлл', 'Антиутопия', NULL, 'Тоталитарное общество', 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf'),
 (11, 'Мастер и Маргарита', 'Михаил Булгаков', 'Мистика', NULL, 'История Воланда', 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf'),
-(12, '', '', '', NULL, '', ''),
-(13, '', '', '', NULL, '', ''),
-(14, 'Тест', 'Автор', 'Учебник', NULL, 'Проверка', 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf'),
-(15, 'ТЕСТ', 'Я', 'РОК', NULL, 'в', 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf');
+(16, '1984', 'Джордж Оруэлл', 'Антиутопия', NULL, '...', 'http://...'),
+(20, 'Тест', 'Я', 'Тест', NULL, 'тест', 'https://example.com/book.pdf'),
+(21, 'Лекция', 'Адрей', 'учебник', NULL, 'да', 'http://127.0.0.1/library_api/uploads/book_6a38d64362fd18.68928115.pdf');
 
 -- --------------------------------------------------------
 
@@ -66,42 +65,6 @@ CREATE TABLE `book_issue` (
   `return_date_plan` date DEFAULT NULL,
   `return_date_fact` date DEFAULT NULL,
   `status` enum('issued','returned') DEFAULT 'issued'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `borrowings`
---
-
-CREATE TABLE `borrowings` (
-  `id` int(11) NOT NULL,
-  `id_user` int(11) DEFAULT NULL,
-  `id_book` int(11) DEFAULT NULL,
-  `borrow_date` date DEFAULT NULL,
-  `return_date` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Дамп данных таблицы `borrowings`
---
-
-INSERT INTO `borrowings` (`id`, `id_user`, `id_book`, `borrow_date`, `return_date`) VALUES
-(1, 2, 7, NULL, '2026-06-30'),
-(2, 0, 0, '2026-06-09', '2026-06-23');
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `chat_messages`
---
-
-CREATE TABLE `chat_messages` (
-  `id_message` int(11) NOT NULL,
-  `id_user` int(11) NOT NULL,
-  `id_librarian` int(11) NOT NULL,
-  `message_text` text NOT NULL,
-  `send_date` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -125,7 +88,23 @@ INSERT INTO `favorites` (`id`, `id_user`, `id_book`) VALUES
 (2, 9, 14),
 (3, 9, 14),
 (4, 0, 14),
-(5, 0, 10);
+(5, 0, 10),
+(6, 1, 10),
+(7, 9, 7),
+(8, 9, 8),
+(9, 9, 8),
+(10, 9, 8),
+(11, 9, 8),
+(12, 9, 8),
+(13, 9, 8),
+(14, 9, 18),
+(15, 11, 7),
+(16, 0, 7),
+(17, 11, 8),
+(18, 11, 11),
+(19, 13, 8),
+(20, 13, 20),
+(21, 12, 21);
 
 -- --------------------------------------------------------
 
@@ -138,14 +117,6 @@ CREATE TABLE `favorites_books` (
   `id_user` int(11) NOT NULL,
   `id_book` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Дамп данных таблицы `favorites_books`
---
-
-INSERT INTO `favorites_books` (`id`, `id_user`, `id_book`) VALUES
-(9, 7, 7),
-(10, 8, 10);
 
 -- --------------------------------------------------------
 
@@ -174,23 +145,18 @@ INSERT INTO `history` (`id`, `id_user`, `id_book`, `read_date`) VALUES
 (9, 9, 7, '2026-06-10 18:26:59'),
 (10, 9, 14, '2026-06-10 18:27:04'),
 (11, 7, 14, '2026-06-10 18:27:25'),
-(12, 9, 15, '2026-06-10 18:28:18');
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `librarians`
---
-
-CREATE TABLE `librarians` (
-  `id_librarian` int(11) NOT NULL,
-  `surname` varchar(50) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `patronymic` varchar(50) DEFAULT NULL,
-  `login` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `position` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+(12, 9, 15, '2026-06-10 18:28:18'),
+(13, 9, 10, '2026-06-18 15:47:20'),
+(14, 11, 9, '2026-06-18 19:51:55'),
+(15, 11, 7, '2026-06-18 19:52:05'),
+(16, 11, 8, '2026-06-22 05:50:36'),
+(17, 11, 11, '2026-06-22 05:50:57'),
+(18, 13, 7, '2026-06-22 05:51:47'),
+(19, 13, 20, '2026-06-22 05:56:03'),
+(20, 13, 7, '2026-06-22 06:20:40'),
+(21, 13, 8, '2026-06-22 06:20:57'),
+(22, 13, 21, '2026-06-22 06:29:43'),
+(23, 12, 21, '2026-06-22 06:30:17');
 
 -- --------------------------------------------------------
 
@@ -260,11 +226,10 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id_user`, `surname`, `name`, `patronymic`, `phone`, `email`, `login`, `password`, `role`, `rating`, `token`) VALUES
 (1, '', '', NULL, NULL, '', '', '', 'reader', 0, NULL),
 (4, 'Гаврико', 'Дима', NULL, NULL, 'ashdyeh@gmail.com', 'giga', '12345678', 'reader', 0, NULL),
-(6, 'Admin', 'Administrator', NULL, NULL, 'admin@library.com', 'admin', 'admin', 'admin', 0, '4b476850dc8af4435b089f14c3f9a46d2ed65d040873b7c4719dff3e4624cf12'),
-(7, 'я', 'я', NULL, NULL, 'я', 'я', 'я', '', 1, 'd1c9c7c9add762f62570c9609b03b63d5e8c8b863cfa31f62813c97009b00e2b'),
-(8, 'ы', 'ы', NULL, NULL, 'ы', 'ы', 'ы', '', 0, '5b376fa53d4402c63c4fafee0d069ad0b9066c7e0c49628e58af358b1f2061d7'),
-(9, '1', '1', NULL, NULL, '1', '1', '1', '', 4, '238a7f4f55b82608354ad410114c53d7c279d2bfaf0a4d661cfe15578ab8f68a'),
-(10, '2', '2', NULL, NULL, '2@', '2', '$2y$10$hQI6UGrTu618Q.LGb0W0Hupl8Gs69abjpXgK9WaaLakDHKD064Gcm', 'reader', 0, NULL);
+(6, 'Admin', 'Administrator', NULL, NULL, 'admin@library.com', 'admin', 'admin', 'admin', 0, '1a55b4535b70f26bddca849709fbf36e9d164d25fb401c635997ff20cfe522e3'),
+(11, 'Иван', 'Иванов', NULL, NULL, 'invan@gmail.com', 'user1', '123456', '', 4, 'b562b078f72734d3bc76b0159ca94e808bfc2fd5b54d6404cc7de2721177c882'),
+(12, '1', '1', NULL, NULL, 'r@f', '1', '1', '', 1, '2a243e709e0dc4dc5ef9f061ed016afd33cb0e8d23b5b4b622058ec27259b745'),
+(13, 'Дима', 'Дима', NULL, NULL, 'dima@', 'Dima', '123456', '', 5, 'ec40e5bee69ec3a9edc7b8b546dc0681c8a1a899bd37989b7cb541f2c220c7d5');
 
 --
 -- Индексы сохранённых таблиц
@@ -285,20 +250,6 @@ ALTER TABLE `book_issue`
   ADD KEY `id_book` (`id_book`);
 
 --
--- Индексы таблицы `borrowings`
---
-ALTER TABLE `borrowings`
-  ADD PRIMARY KEY (`id`);
-
---
--- Индексы таблицы `chat_messages`
---
-ALTER TABLE `chat_messages`
-  ADD PRIMARY KEY (`id_message`),
-  ADD KEY `id_user` (`id_user`),
-  ADD KEY `id_librarian` (`id_librarian`);
-
---
 -- Индексы таблицы `favorites`
 --
 ALTER TABLE `favorites`
@@ -317,13 +268,6 @@ ALTER TABLE `favorites_books`
 --
 ALTER TABLE `history`
   ADD PRIMARY KEY (`id`);
-
---
--- Индексы таблицы `librarians`
---
-ALTER TABLE `librarians`
-  ADD PRIMARY KEY (`id_librarian`),
-  ADD UNIQUE KEY `login` (`login`);
 
 --
 -- Индексы таблицы `reader_rating`
@@ -362,7 +306,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT для таблицы `books`
 --
 ALTER TABLE `books`
-  MODIFY `id_book` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id_book` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT для таблицы `book_issue`
@@ -371,22 +315,10 @@ ALTER TABLE `book_issue`
   MODIFY `id_issue` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT для таблицы `borrowings`
---
-ALTER TABLE `borrowings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT для таблицы `chat_messages`
---
-ALTER TABLE `chat_messages`
-  MODIFY `id_message` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT для таблицы `favorites`
 --
 ALTER TABLE `favorites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT для таблицы `favorites_books`
@@ -398,13 +330,7 @@ ALTER TABLE `favorites_books`
 -- AUTO_INCREMENT для таблицы `history`
 --
 ALTER TABLE `history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT для таблицы `librarians`
---
-ALTER TABLE `librarians`
-  MODIFY `id_librarian` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT для таблицы `reader_rating`
@@ -428,7 +354,7 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -440,13 +366,6 @@ ALTER TABLE `users`
 ALTER TABLE `book_issue`
   ADD CONSTRAINT `book_issue_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `users` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `book_issue_ibfk_2` FOREIGN KEY (`id_book`) REFERENCES `books` (`id_book`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Ограничения внешнего ключа таблицы `chat_messages`
---
-ALTER TABLE `chat_messages`
-  ADD CONSTRAINT `chat_messages_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `users` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `chat_messages_ibfk_2` FOREIGN KEY (`id_librarian`) REFERENCES `librarians` (`id_librarian`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `favorites_books`
